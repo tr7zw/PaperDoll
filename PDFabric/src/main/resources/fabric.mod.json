@@ -9,11 +9,11 @@
       "tr7zw"
     ],
     "contact": {
-      "homepage": "https://fabricmc.net/",
-      "sources": "https://github.com/FabricMC/fabric-example-mod"
+      "homepage": "https://github.com/tr7zw",
+      "sources": "https://github.com/tr7zw/PaperDoll"
     },
   
-    "license": "CC0-1.0",
+    "license": "MIT",
     "icon": "assets/paperdoll/icon.png",
   
     "environment": "CLIENT",
