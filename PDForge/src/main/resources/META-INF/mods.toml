@@ -1,0 +1,34 @@
+# This is an example mods.toml file.
+# Any fields that aren't annotated with #optional are *required*!
+modLoader = "javafml"
+loaderVersion = "[36,)"
+license = "All rights reserved" # Want to make your mod open source? Check out https://choosealicense.com/!
+
+# This is a URL to e.g. your GitHub or CurseForge issues page.
+# It will appear in any crash reports this mod is directly involved in.
+# issueTrackerURL="https://github.com/invalid/pleasechangeme/issues" #optional
+# A list of mods - how many allowed here is determined by the individual mod loader
+
+[[mods]]
+modId = "paperdoll"
+version = "${version}"
+displayName = "PaperDoll"
+logoFile="icon.png" #optional
+ authors="tr7zw" #optional
+description = '''
+Shows a small preview of the player in a corner of the screen.
+'''
+
+[[dependencies.paperdoll]]
+modId = "forge"
+mandatory = true # do you **need** this mod to be able to launch?
+versionRange = "[36,)" # This essentially means any forge >= 36
+ordering = "NONE" # Use this if you want your mod to be loaded specifically BEFORE or AFTER another mod
+side = "BOTH" # Specify where this mod is required: can be BOTH, CLIENT or SERVER
+
+[[dependencies.paperdoll]]
+modId = "minecraft"
+mandatory = true
+versionRange = "[1.17,1.18)"
+ordering = "NONE"
+side = "BOTH"

@@ -1,0 +1,38 @@
+{
+    "schemaVersion": 1,
+    "id": "paperdoll",
+    "version": "${version}",
+  
+    "name": "PaperDoll",
+    "description": "Shows a small preview of the player in a corner of the screen.",
+    "authors": [
+      "tr7zw"
+    ],
+    "contact": {
+      "homepage": "https://fabricmc.net/",
+      "sources": "https://github.com/FabricMC/fabric-example-mod"
+    },
+  
+    "license": "CC0-1.0",
+    "icon": "assets/paperdoll/icon.png",
+  
+    "environment": "CLIENT",
+    "entrypoints": {
+      "main": [
+        "dev.tr7zw.paperdoll.PaperDollMod"
+      ],
+      "modmenu": [
+        "dev.tr7zw.paperdoll.PaperDollModMenu"
+      ]
+    },
+    "mixins": [
+      "paperdoll.mixins.json"
+    ],
+  
+    "depends": {
+      "fabricloader": ">=0.11.3",
+      "fabric": "*",
+      "minecraft": "1.17.x",
+      "java": ">=16"
+    }
+  }
