@@ -1,8 +1,7 @@
 {
   "required": true,
-  "minVersion": "0.8",
   "package": "dev.tr7zw.paperdoll.mixin",
-  "compatibilityLevel": "JAVA_16",
+  "compatibilityLevel": "JAVA_8",
   "mixins": [
   ],
   "client": [

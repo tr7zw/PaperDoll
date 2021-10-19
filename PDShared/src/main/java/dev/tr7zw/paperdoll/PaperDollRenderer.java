@@ -62,37 +62,35 @@ public class PaperDollRenderer {
             boolean lockHead) {
         float h = (float) Math.atan((double) (f / 40.0F));
         float l = (float) Math.atan((double) (g / 40.0F));
-        PoseStack poseStack = RenderSystem.getModelViewStack();
-        poseStack.pushPose();
-        poseStack.translate(i, j, 1050.0D);
-        poseStack.scale(1.0F, 1.0F, -1.0F);
-        RenderSystem.applyModelViewMatrix();
-        PoseStack matrixStack = new PoseStack();
-        matrixStack.translate(0.0D, 0.0D, 1000.0D);
-        matrixStack.scale((float) k, (float) k, (float) k);
+        RenderSystem.pushMatrix();
+        RenderSystem.translatef(i, j, 1050.0F);
+        RenderSystem.scalef(1.0F, 1.0F, -1.0F);
+        PoseStack poseStack = new PoseStack();
+        poseStack.translate(0.0D, 0.0D, 1000.0D);
+        poseStack.scale((float) k, (float) k, (float) k);
         Quaternion quaternion = Vector3f.ZP.rotationDegrees(180.0F);
         Quaternion quaternion2 = Vector3f.XP.rotationDegrees(l * 20.0F);
         quaternion.mul(quaternion2);
-        matrixStack.mulPose(quaternion);
+        poseStack.mulPose(quaternion);
         float yBodyRot = livingEntity.yBodyRot;
-        float yRot = livingEntity.getYRot();
+        float yRot = livingEntity.yRot;
         float yRotO = livingEntity.yRotO;
         float yBodyRotO = livingEntity.yBodyRotO;
-        float xRot = livingEntity.getXRot();
+        float xRot = livingEntity.xRot;
         float xRotO = livingEntity.xRotO;
         float yHeadRotO = livingEntity.yHeadRotO;
         float yHeadRot = livingEntity.yHeadRot;
         Vec3 vel = livingEntity.getDeltaMovement();
         livingEntity.yBodyRot = 180.0F + h * 20.0F;
-        livingEntity.setYRot(180.0F + h * 40.0F);
+        livingEntity.yRot = (180.0F + h * 40.0F);
         livingEntity.yBodyRotO = livingEntity.yBodyRot;
-        livingEntity.yRotO = livingEntity.getYRot();
+        livingEntity.yRotO = livingEntity.yRot;
         livingEntity.setDeltaMovement(Vec3.ZERO);
         if (lockHead) {
-            livingEntity.setXRot(-l * 20.0F);
-            livingEntity.xRotO = livingEntity.getXRot();
-            livingEntity.yHeadRot = livingEntity.getYRot();
-            livingEntity.yHeadRotO = livingEntity.getYRot();
+            livingEntity.xRot = (-l * 20.0F);
+            livingEntity.xRotO = livingEntity.xRot;
+            livingEntity.yHeadRot = livingEntity.yRot;
+            livingEntity.yHeadRotO = livingEntity.yRot;
         } else {
             if (instance.settings.dollHeadMode == DollHeadMode.FREE) {
                 livingEntity.yHeadRot = 180.0F + h * 40.0F - (yBodyRot - yHeadRot);
@@ -102,7 +100,7 @@ public class PaperDollRenderer {
                 livingEntity.yHeadRotO = 180.0F + h * 40.0F - (yRotO - yHeadRotO);
             }
         }
-        Lighting.setupForEntityInInventory();
+        Lighting.setupForFlatItems();
         EntityRenderDispatcher entityRenderDispatcher = mc_instance.getEntityRenderDispatcher();
         quaternion2.conj();
         entityRenderDispatcher.overrideCameraOrientation(quaternion2);
@@ -110,20 +108,19 @@ public class PaperDollRenderer {
         MultiBufferSource.BufferSource bufferSource = Minecraft.getInstance().renderBuffers().bufferSource();
         // Mc renders the player in the inventory without delta, causing it to look
         // "laggy". Good luck unseeing this :)
-        entityRenderDispatcher.render(livingEntity, 0.0D, 0.0D, 0.0D, 0.0F, delta, matrixStack, bufferSource, 15728880);
+        entityRenderDispatcher.render(livingEntity, 0.0D, 0.0D, 0.0D, 0.0F, delta, poseStack, bufferSource, 15728880);
         bufferSource.endBatch();
         entityRenderDispatcher.setRenderShadow(true);
         livingEntity.yBodyRot = yBodyRot;
         livingEntity.yBodyRotO = yBodyRotO;
-        livingEntity.setYRot(yRot);
+        livingEntity.yRot = (yRot);
         livingEntity.yRotO = yRotO;
-        livingEntity.setXRot(xRot);
+        livingEntity.xRot = (xRot);
         livingEntity.xRotO = xRotO;
         livingEntity.yHeadRotO = yHeadRotO;
         livingEntity.yHeadRot = yHeadRot;
         livingEntity.setDeltaMovement(vel);
-        poseStack.popPose();
-        RenderSystem.applyModelViewMatrix();
+        RenderSystem.popMatrix();
         Lighting.setupFor3DItems();
     }
     

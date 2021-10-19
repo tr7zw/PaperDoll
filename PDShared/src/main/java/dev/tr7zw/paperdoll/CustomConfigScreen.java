@@ -1,22 +1,19 @@
 package dev.tr7zw.paperdoll;
 
-import java.util.Arrays;
 import java.util.List;
 import java.util.concurrent.atomic.AtomicReference;
 import java.util.function.Consumer;
-import java.util.function.Function;
 import java.util.function.Supplier;
 
 import com.mojang.blaze3d.vertex.PoseStack;
 
+import net.minecraft.client.BooleanOption;
 import net.minecraft.client.CycleOption;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.ProgressOption;
 import net.minecraft.client.gui.components.AbstractWidget;
 import net.minecraft.client.gui.components.Button;
 import net.minecraft.client.gui.components.Button.OnPress;
-import net.minecraft.client.gui.components.CycleButton;
-import net.minecraft.client.gui.components.CycleButton.TooltipSupplier;
 import net.minecraft.client.gui.components.OptionsList;
 import net.minecraft.client.gui.components.SliderButton;
 import net.minecraft.client.gui.screens.OptionsSubScreen;
@@ -62,7 +59,7 @@ public abstract class CustomConfigScreen extends Screen {
 	public abstract void save();
 
 	protected void createFooter() {
-		this.addRenderableWidget(
+		this.addButton(
 				new Button(this.width / 2 - 100, this.height - 27, 200, 20, CommonComponents.GUI_DONE, new OnPress() {
 
 					@Override
@@ -77,8 +74,6 @@ public abstract class CustomConfigScreen extends Screen {
 		this.list.render(poseStack, i, j, f);
 		drawCenteredString(poseStack, this.font, this.title, this.width / 2, 20, 16777215);
 		super.render(poseStack, i, j, f);
-		List<FormattedCharSequence> list = OptionsSubScreen.tooltipAt(this.list, i, j);
-		this.renderTooltip(poseStack, list, i, j);
 	}
 	
 	private void updateText(ProgressOption option) {
@@ -88,17 +83,15 @@ public abstract class CustomConfigScreen extends Screen {
         }
 	}
 
-	public CycleOption<Boolean> getBooleanOption(String translationKey, Supplier<Boolean> current,
+	public BooleanOption getBooleanOption(String translationKey, Supplier<Boolean> current,
 			Consumer<Boolean> update) {
-		return CycleOption.createBinaryOption(translationKey, new TranslatableComponent(translationKey + ".on"),
-				new TranslatableComponent(translationKey + ".off"), options -> current.get(),
-				(options, option, boolean_) -> update.accept(boolean_));
+		return new BooleanOption(translationKey, title, (options) -> current.get(), (options, b) -> update.accept(b));
 	}
+	
 
-	public CycleOption<Boolean> getOnOffOption(String translationKey, Supplier<Boolean> current,
+	public BooleanOption getOnOffOption(String translationKey, Supplier<Boolean> current,
 			Consumer<Boolean> update) {
-		return CycleOption.createOnOff(translationKey, options -> current.get(),
-				(options, option, boolean_) -> update.accept(boolean_));
+		return getBooleanOption(translationKey, current, update);
 	}
 	
 	public ProgressOption getDoubleOption(String translationKey, float min, float max, float steps, Supplier<Double> current,
@@ -107,11 +100,6 @@ public abstract class CustomConfigScreen extends Screen {
 		return new ProgressOption(translationKey, min, max, steps, (options) -> current.get(), (options, val) -> update.accept(val), (options, opt) -> comp.append(new TextComponent(": "+opt.get(options))));
 	}
 	
-	public ProgressOption getDoubleOption(String translationKey, float min, float max, float steps, Supplier<Double> current,
-			Consumer<Double> update, String tooltip) {
-	    TranslatableComponent comp = new TranslatableComponent(translationKey);
-		return new ProgressOption(translationKey, min, max, steps, (options) -> current.get(), (options, val) -> update.accept(val), (options, opt) -> comp.append(new TextComponent(": "+opt.get(options))), (minecraft) -> minecraft.font.split(new TranslatableComponent(tooltip), 200));
-	}
 	
 	public ProgressOption getIntOption(String translationKey, float min, float max, Supplier<Integer> current,
 			Consumer<Integer> update) {
@@ -120,31 +108,10 @@ public abstract class CustomConfigScreen extends Screen {
 		option.set(new ProgressOption(translationKey, min, max, 1, (options) -> (double)current.get(), (options, val) -> {update.accept(val.intValue()); updateText(option.get());}, (options, opt) -> comp.copy().append(": " + current.get())));
 		return option.get();
 	}
-	
-	public ProgressOption getIntOption(String translationKey, float min, float max, Supplier<Integer> current,
-			Consumer<Integer> update, String tooltip) {
-	    TranslatableComponent comp = new TranslatableComponent(translationKey);
-		return new ProgressOption(translationKey, min, max, 1, (options) -> (double)current.get(), (options, val) -> update.accept(val.intValue()), (options, opt) -> comp, (minecraft) -> minecraft.font.split(new TranslatableComponent(tooltip), 200));
-	}
 
 	public <T extends Enum> CycleOption getEnumOption(String translationKey, Class<T> targetEnum, Supplier<T> current,
 			Consumer<T> update) {
-		return CycleOption.create(translationKey, Arrays.asList(targetEnum.getEnumConstants()),
-				(t) -> new TranslatableComponent(translationKey + "." + t.name()), options -> current.get(),
-				(options, option, value) -> update.accept(value));
+	    return new CycleOption(translationKey, (options, integer) -> update.accept(targetEnum.getEnumConstants()[(current.get().ordinal() + integer.intValue()) % targetEnum.getEnumConstants().length]), (options, cycleOption) -> new TranslatableComponent(translationKey + "." + current.get().name()));
 	}
-
-	public <T> Function<Minecraft, CycleButton.TooltipSupplier<T>> createStaticTooltip(String translationKey) {
-		TranslatableComponent component = new TranslatableComponent(translationKey);
-		return (minecraft) -> {
-			return new TooltipSupplier<T>() {
-
-				@Override
-				public List<FormattedCharSequence> apply(T t) {
-					return minecraft.font.split(component, 200);
-				}
-			};
-		};
-	}
-
+	
 }

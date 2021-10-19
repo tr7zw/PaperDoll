@@ -1,13 +1,19 @@
 package dev.tr7zw.paperdoll;
 
+import java.util.function.BiFunction;
+
+import org.apache.commons.lang3.tuple.Pair;
+
+import net.minecraft.client.Minecraft;
+import net.minecraft.client.gui.screens.Screen;
 import net.minecraftforge.client.event.RenderGameOverlayEvent;
 import net.minecraftforge.client.event.RenderGameOverlayEvent.ElementType;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
-import net.minecraftforge.fml.IExtensionPoint;
+import net.minecraftforge.fml.ExtensionPoint;
 import net.minecraftforge.fml.ModLoadingContext;
 import net.minecraftforge.fml.common.Mod;
-import net.minecraftforge.fmlclient.ConfigGuiHandler.ConfigGuiFactory;
+import net.minecraftforge.fml.network.FMLNetworkConstants;
 
 @Mod("paperdoll")
 public class PaperDollMod extends PaperDollShared {
@@ -19,13 +25,17 @@ public class PaperDollMod extends PaperDollShared {
             LOGGER.warn("PaperDoll Mod installed on a Server. Going to sleep.");
             return;
         }
-        ModLoadingContext.get().registerExtensionPoint(IExtensionPoint.DisplayTest.class,
-                () -> new IExtensionPoint.DisplayTest(
-                        () -> ModLoadingContext.get().getActiveContainer().getModInfo().getVersion().toString(),
-                        (remote, isServer) -> true));
-        ModLoadingContext.get().registerExtensionPoint(ConfigGuiFactory.class, () -> new ConfigGuiFactory((mc, screen) -> {
-            return createConfigScreen(screen);
-        }));
+        ModLoadingContext.get().registerExtensionPoint(ExtensionPoint.DISPLAYTEST,
+                () -> Pair.of(() -> FMLNetworkConstants.IGNORESERVERONLY, (remote, isServer) -> true));
+        ModLoadingContext.get().registerExtensionPoint(
+                ExtensionPoint.CONFIGGUIFACTORY,
+                () -> new BiFunction<Minecraft, Screen, Screen>() {
+                    @Override
+                    public Screen apply(Minecraft t, Screen screen) {
+                        return createConfigScreen(screen);
+                    }
+                }
+        );
         init();
         MinecraftForge.EVENT_BUS.addListener(this::onOverlay);
     }
