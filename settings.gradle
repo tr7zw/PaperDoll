@@ -9,6 +9,6 @@ pluginManagement {
 
 include("PDShared")
 include("PDFabric")
-//include("PDForge")
+include("PDForge")
 
 rootProject.name = "PaperDoll"
