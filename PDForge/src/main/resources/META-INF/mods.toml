@@ -2,7 +2,7 @@
 # Any fields that aren't annotated with #optional are *required*!
 modLoader = "javafml"
 loaderVersion = "[36,)"
-license = "MIT"
+license = "tr7zw Protective License"
 
 # This is a URL to e.g. your GitHub or CurseForge issues page.
 # It will appear in any crash reports this mod is directly involved in.
