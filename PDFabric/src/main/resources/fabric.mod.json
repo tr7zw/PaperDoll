@@ -13,7 +13,7 @@
       "sources": "https://github.com/tr7zw/PaperDoll"
     },
   
-    "license": "MIT",
+    "license": "tr7zw Protective License",
     "icon": "assets/paperdoll/icon.png",
   
     "environment": "CLIENT",
