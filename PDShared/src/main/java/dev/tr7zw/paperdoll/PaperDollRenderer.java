@@ -57,10 +57,10 @@ public class PaperDollRenderer {
 //        }
         Entity playerEntity = mc_instance.getCameraEntity() != null ? mc_instance.getCameraEntity() : mc_instance.player;
         if(playerEntity.isPassenger()) {
-            Entity vehicle = playerEntity.getVehicle();
+            Entity vehicle = playerEntity.getRootVehicle();
             vehicle.getPassengersAndSelf().forEachOrdered(entity -> {
                 double yOffset = fYpos;
-                if(entity == vehicle)
+                if(entity != playerEntity)
                     yOffset += (playerEntity.getY() - entity.getY()) *35;
                 if(entity instanceof LivingEntity living) {
                     drawLivingEntity(fXpos, yOffset, size, lookSides, lookUpDown, living, delta,
