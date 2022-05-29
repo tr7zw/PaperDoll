@@ -10,6 +10,7 @@ public class PaperDollSettings {
     public int dollLookingSides = 20;
     public int dollLookingUpDown = -20;
     public DollHeadMode dollHeadMode = DollHeadMode.FREE;
+    public boolean autoHide = false;
 
     public enum DollHeadMode {
         FREE, STATIC, LOCKED

@@ -22,6 +22,7 @@
     "text.paperdoll.location.TOP_LEFT": "Top left",
     "text.paperdoll.location.TOP_RIGHT": "Top right",
     "text.paperdoll.location.BOTTOM_LEFT": "Bottom left",
-    "text.paperdoll.location.BOTTOM_RIGHT": "Bottom right"
+    "text.paperdoll.location.BOTTOM_RIGHT": "Bottom right",
+    "text.paperdoll.autohide": "Autohide"
 
   }
