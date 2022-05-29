@@ -152,8 +152,13 @@ public class PaperDollRenderer {
         double offsetZ = 0;
         if(livingEntity.isPassenger()) {
             Entity vehicle = livingEntity.getVehicle();
-//            offsetX = livingEntity.getX() - vehicle.getX();
-//            offsetZ = livingEntity.getZ() - vehicle.getZ();
+            double offsetXTmp = livingEntity.getX() - vehicle.getX();
+            double offsetZTmp = livingEntity.getZ() - vehicle.getZ();
+            float rotation = vehicle.getYRot() - 180 - rotationSide * 20.0F; // target is 180
+            rotation *= Mth.DEG_TO_RAD;
+            rotation *= -1;
+            offsetX += Math.cos(rotation) * offsetXTmp - Math.sin(rotation)* offsetZTmp;
+            offsetZ += Math.sin(rotation)*offsetXTmp + Math.cos(rotation)* offsetZTmp;
             // y offset is handeled above since the vehicle is moved down
         }
         // Mc renders the player in the inventory without delta, causing it to look
