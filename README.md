@@ -10,6 +10,8 @@ You can access the config screen in the Modlist (Fabric requires [ModMenu](https
 
 ![](screenshots/config.png)
 
+![](screenshots/boats.png)
+
 ## License
 
 This project is licensed under [``tr7zw Protective License``](LICENSE).

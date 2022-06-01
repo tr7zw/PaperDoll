@@ -80,7 +80,7 @@ public class PaperDollRenderer {
             vehicle.getPassengersAndSelf().forEachOrdered(entity -> {
                 double yOffset = fYpos;
                 if (entity != playerEntity)
-                    yOffset += (playerEntity.getY() - entity.getY()) * 35;
+                    yOffset += (playerEntity.getY() - entity.getY()) * size;
                 if (entity instanceof LivingEntity living) {
                     drawLivingEntity(fXpos, yOffset, size, lookSides, lookUpDown, living, delta,
                             instance.settings.dollHeadMode == DollHeadMode.LOCKED);
