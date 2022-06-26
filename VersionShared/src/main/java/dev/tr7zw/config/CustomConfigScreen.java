@@ -1,4 +1,4 @@
-package dev.tr7zw.paperdoll;
+package dev.tr7zw.config;
 
 import java.util.Arrays;
 import java.util.List;
@@ -59,6 +59,8 @@ public abstract class CustomConfigScreen extends Screen {
 
 	public abstract void initialize();
 	
+	public abstract void reset();
+	
 	public abstract void save();
 
 	protected void createFooter() {
@@ -70,6 +72,15 @@ public abstract class CustomConfigScreen extends Screen {
 						CustomConfigScreen.this.onClose();
 					}
 				}));
+		this.addRenderableWidget(
+                new Button(this.width / 2 + 110, this.height - 27, 60, 20, new TranslatableComponent("controls.reset"), new OnPress() {
+
+                    @Override
+                    public void onPress(Button button) {
+                        reset();
+                        CustomConfigScreen.this.resize(minecraft, width, height); // refresh
+                    }
+                }));
 	}
 
 	public void render(PoseStack poseStack, int i, int j, float f) {
@@ -81,10 +92,13 @@ public abstract class CustomConfigScreen extends Screen {
 		this.renderTooltip(poseStack, list, i, j);
 	}
 	
-	private void updateText(ProgressOption option) {
+	@SuppressWarnings("resource")
+    private void updateText(ProgressOption option) {
 	    AbstractWidget widget = getOptions().findOption(option);
         if(widget instanceof SliderButton) {
             ((SliderButton)widget).setMessage(option.getMessage(Minecraft.getInstance().options));
+        }else {
+            System.out.println(widget.getClass().getName());
         }
 	}
 
@@ -104,7 +118,9 @@ public abstract class CustomConfigScreen extends Screen {
 	public ProgressOption getDoubleOption(String translationKey, float min, float max, float steps, Supplier<Double> current,
 			Consumer<Double> update) {
 	    TranslatableComponent comp = new TranslatableComponent(translationKey);
-		return new ProgressOption(translationKey, min, max, steps, (options) -> current.get(), (options, val) -> update.accept(val), (options, opt) -> comp.append(new TextComponent(": "+opt.get(options))));
+	    AtomicReference<ProgressOption> option = new AtomicReference<>();
+	    option.set(new ProgressOption(translationKey, min, max, steps, (options) -> current.get(), (options, val) -> {update.accept(val); updateText(option.get());}, (options, opt) -> comp.copy().append(": " + round(current.get(), 3))));
+		return option.get();
 	}
 	
 	public ProgressOption getDoubleOption(String translationKey, float min, float max, float steps, Supplier<Double> current,
@@ -127,7 +143,8 @@ public abstract class CustomConfigScreen extends Screen {
 		return new ProgressOption(translationKey, min, max, 1, (options) -> (double)current.get(), (options, val) -> update.accept(val.intValue()), (options, opt) -> comp, (minecraft) -> minecraft.font.split(new TranslatableComponent(tooltip), 200));
 	}
 
-	public <T extends Enum> CycleOption getEnumOption(String translationKey, Class<T> targetEnum, Supplier<T> current,
+	@SuppressWarnings("rawtypes")
+    public <T extends Enum> CycleOption getEnumOption(String translationKey, Class<T> targetEnum, Supplier<T> current,
 			Consumer<T> update) {
 		return CycleOption.create(translationKey, Arrays.asList(targetEnum.getEnumConstants()),
 				(t) -> new TranslatableComponent(translationKey + "." + t.name()), options -> current.get(),
@@ -145,6 +162,15 @@ public abstract class CustomConfigScreen extends Screen {
 				}
 			};
 		};
+	}
+	
+	public static double round(double value, int places) {
+	    if (places < 0) throw new IllegalArgumentException();
+
+	    long factor = (long) Math.pow(10, places);
+	    value = value * factor;
+	    long tmp = Math.round(value);
+	    return (double) tmp / factor;
 	}
 
 }

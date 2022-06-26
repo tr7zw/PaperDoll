@@ -14,13 +14,10 @@ import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.mojang.blaze3d.vertex.PoseStack;
 
+import dev.tr7zw.config.CustomConfigScreen;
 import dev.tr7zw.paperdoll.PaperDollSettings.DollHeadMode;
 import dev.tr7zw.paperdoll.PaperDollSettings.PaperDollLocation;
-import net.minecraft.client.Minecraft;
 import net.minecraft.client.Option;
-import net.minecraft.client.ProgressOption;
-import net.minecraft.client.gui.components.AbstractWidget;
-import net.minecraft.client.gui.components.SliderButton;
 import net.minecraft.client.gui.screens.Screen;
 
 public class PaperDollShared {
@@ -89,6 +86,12 @@ public class PaperDollShared {
             public void render(PoseStack poseStack, int i, int j, float f) {
                 super.render(poseStack, i, j, f);
                 renderer.render(f);
+            }
+
+            @Override
+            public void reset() {
+                settings = new PaperDollSettings();
+                writeSettings();
             }
             
         };
