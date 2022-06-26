@@ -67,8 +67,8 @@ public class PaperDollShared {
                 List<Option> options = new ArrayList<>();
                 options.add(getEnumOption("text.paperdoll.location", PaperDollLocation.class, () -> settings.location, (loc) -> settings.location = loc));
                 options.add(getEnumOption("text.paperdoll.headMode", DollHeadMode.class, () -> settings.dollHeadMode, (mode) -> settings.dollHeadMode = mode));
-                options.add(getIntOption("text.paperdoll.xOffset", -50, 50, () -> settings.dollXOffset, (i) -> settings.dollXOffset = i));
-                options.add(getIntOption("text.paperdoll.yOffset", -50, 50, () -> settings.dollYOffset, (i) -> settings.dollYOffset = i));
+                options.add(getIntOption("text.paperdoll.xOffset", -100, 100, () -> settings.dollXOffset, (i) -> settings.dollXOffset = i));
+                options.add(getIntOption("text.paperdoll.yOffset", -100, 100, () -> settings.dollYOffset, (i) -> settings.dollYOffset = i));
                 options.add(getIntOption("text.paperdoll.size", -12, 40, () -> settings.dollSize, (i) -> settings.dollSize = i));
                 options.add(getIntOption("text.paperdoll.lookingSides", -80, 80, () -> settings.dollLookingSides, (i) -> settings.dollLookingSides = i));
                 options.add(getIntOption("text.paperdoll.lookingUpDown", -80, 80, () -> settings.dollLookingUpDown, (i) -> settings.dollLookingUpDown = i));
