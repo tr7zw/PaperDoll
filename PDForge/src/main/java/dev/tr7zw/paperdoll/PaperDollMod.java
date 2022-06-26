@@ -33,7 +33,7 @@ public class PaperDollMod extends PaperDollShared {
     @SubscribeEvent
     public void onOverlay(RenderGameOverlayEvent.Post e) {
         if(e.getType() != ElementType.ALL)return;
-        renderer.render(e.getPartialTicks());
+        renderer.render(e.getPartialTick());
     }
     
 }

@@ -17,7 +17,7 @@ import com.mojang.blaze3d.vertex.PoseStack;
 import dev.tr7zw.config.CustomConfigScreen;
 import dev.tr7zw.paperdoll.PaperDollSettings.DollHeadMode;
 import dev.tr7zw.paperdoll.PaperDollSettings.PaperDollLocation;
-import net.minecraft.client.Option;
+import net.minecraft.client.OptionInstance;
 import net.minecraft.client.gui.screens.Screen;
 
 public class PaperDollShared {
@@ -64,7 +64,7 @@ public class PaperDollShared {
             @Override
             public void initialize() {
                 getOptions().addBig(getOnOffOption("text.paperdoll.enabled", () -> settings.dollEnabled, (b) -> settings.dollEnabled = b));
-                List<Option> options = new ArrayList<>();
+                List<OptionInstance<?>> options = new ArrayList<>();
                 options.add(getEnumOption("text.paperdoll.location", PaperDollLocation.class, () -> settings.location, (loc) -> settings.location = loc));
                 options.add(getEnumOption("text.paperdoll.headMode", DollHeadMode.class, () -> settings.dollHeadMode, (mode) -> settings.dollHeadMode = mode));
                 options.add(getIntOption("text.paperdoll.xOffset", -50, 50, () -> settings.dollXOffset, (i) -> settings.dollXOffset = i));
@@ -73,7 +73,7 @@ public class PaperDollShared {
                 options.add(getIntOption("text.paperdoll.lookingSides", -80, 80, () -> settings.dollLookingSides, (i) -> settings.dollLookingSides = i));
                 options.add(getIntOption("text.paperdoll.lookingUpDown", -80, 80, () -> settings.dollLookingUpDown, (i) -> settings.dollLookingUpDown = i));
                 options.add(getOnOffOption("text.paperdoll.autohide", () -> settings.autoHide, (b) -> settings.autoHide = b));
-                getOptions().addSmall(options.toArray(new Option[0]));
+                getOptions().addSmall(options.toArray(new OptionInstance[0]));
                 
             }
             
