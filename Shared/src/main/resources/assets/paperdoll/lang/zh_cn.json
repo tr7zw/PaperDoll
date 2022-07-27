@@ -1,0 +1,28 @@
+{
+    "text.paperdoll.title": "纸娃娃设置",
+
+    "text.paperdoll.enabled": "纸娃娃已启用",
+    "text.paperdoll.xOffset": "纸娃娃X偏移",
+    "text.paperdoll.xOffset.@Tooltip": "左右移动",
+    "text.paperdoll.yOffset": "纸娃娃Y偏移",
+    "text.paperdoll.yOffset.@Tooltip": "上下移动",
+    "text.paperdoll.size": "纸娃娃大小",
+    "text.paperdoll.size.@Tooltip": "改变纸娃娃的尺寸",
+    "text.paperdoll.lookingSides": "纸娃娃视角方向",
+    "text.paperdoll.lookingSides.@Tooltip": "改变纸娃娃的头部看向的左右方向",
+    "text.paperdoll.lookingUpDown": "纸娃娃视角上下",
+    "text.paperdoll.lookingUpDown.@Tooltip": "改变纸娃娃的头部看向的上下方向",
+    "text.paperdoll.headMode": "纸娃娃头部锁定",
+    "text.paperdoll.headMode.@Tooltip": "改变头部如何对玩家移动做出反应",
+    "text.paperdoll.headMode.FREE": "浮动",
+    "text.paperdoll.headMode.STATIC": "静态",
+    "text.paperdoll.headMode.LOCKED": "锁定",
+    "text.paperdoll.location": "纸娃娃位置",
+    "text.paperdoll.location.@Tooltip": "在屏幕的4个角落中切换",
+    "text.paperdoll.location.TOP_LEFT": "左上角",
+    "text.paperdoll.location.TOP_RIGHT": "右上角",
+    "text.paperdoll.location.BOTTOM_LEFT": "左下角",
+    "text.paperdoll.location.BOTTOM_RIGHT": "右下角",
+    "text.paperdoll.autohide": "自动隐藏"
+
+  }
