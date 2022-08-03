@@ -11,6 +11,7 @@ public class PaperDollSettings {
     public int dollLookingUpDown = -20;
     public DollHeadMode dollHeadMode = DollHeadMode.FREE;
     public boolean autoHide = false;
+    public boolean hideInF5 = true;
 
     public enum DollHeadMode {
         FREE, STATIC, LOCKED

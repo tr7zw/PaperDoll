@@ -73,6 +73,7 @@ public class PaperDollShared {
                 options.add(getIntOption("text.paperdoll.lookingSides", -80, 80, () -> settings.dollLookingSides, (i) -> settings.dollLookingSides = i));
                 options.add(getIntOption("text.paperdoll.lookingUpDown", -80, 80, () -> settings.dollLookingUpDown, (i) -> settings.dollLookingUpDown = i));
                 options.add(getOnOffOption("text.paperdoll.autohide", () -> settings.autoHide, (b) -> settings.autoHide = b));
+                options.add(getOnOffOption("text.paperdoll.hideInF5", () -> settings.hideInF5, (b) -> settings.hideInF5 = b));
                 getOptions().addSmall(options.toArray(new OptionInstance[0]));
                 
             }

@@ -7,6 +7,7 @@ import com.mojang.math.Quaternion;
 import com.mojang.math.Vector3f;
 
 import dev.tr7zw.paperdoll.PaperDollSettings.DollHeadMode;
+import net.minecraft.client.CameraType;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.MultiBufferSource;
 import net.minecraft.client.renderer.entity.EntityRenderDispatcher;
@@ -73,6 +74,10 @@ public class PaperDollRenderer {
             }
             if (!hide)
                 showTill = System.currentTimeMillis() + 500;
+        }
+        
+        if(instance.settings.hideInF5 && Minecraft.getInstance().options.getCameraType() != CameraType.FIRST_PERSON) {
+            return;
         }
 
         if (playerEntity.isPassenger()) {

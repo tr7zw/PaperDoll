@@ -23,6 +23,7 @@
     "text.paperdoll.location.TOP_RIGHT": "Top right",
     "text.paperdoll.location.BOTTOM_LEFT": "Bottom left",
     "text.paperdoll.location.BOTTOM_RIGHT": "Bottom right",
-    "text.paperdoll.autohide": "Autohide"
+    "text.paperdoll.autohide": "Autohide",
+    "text.paperdoll.hideInF5": "Hide In F5"
 
   }
