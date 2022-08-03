@@ -1,8 +1,7 @@
 package dev.tr7zw.paperdoll;
 
-import net.minecraftforge.client.ConfigGuiHandler.ConfigGuiFactory;
-import net.minecraftforge.client.event.RenderGameOverlayEvent;
-import net.minecraftforge.client.event.RenderGameOverlayEvent.ElementType;
+import net.minecraftforge.client.ConfigScreenHandler.ConfigScreenFactory;
+import net.minecraftforge.client.event.RenderGuiEvent;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.IExtensionPoint;
@@ -23,7 +22,7 @@ public class PaperDollMod extends PaperDollShared {
                 () -> new IExtensionPoint.DisplayTest(
                         () -> ModLoadingContext.get().getActiveContainer().getModInfo().getVersion().toString(),
                         (remote, isServer) -> true));
-        ModLoadingContext.get().registerExtensionPoint(ConfigGuiFactory.class, () -> new ConfigGuiFactory((mc, screen) -> {
+        ModLoadingContext.get().registerExtensionPoint(ConfigScreenFactory.class, () -> new ConfigScreenFactory((mc, screen) -> {
             return createConfigScreen(screen);
         }));
         init();
@@ -31,8 +30,7 @@ public class PaperDollMod extends PaperDollShared {
     }
 
     @SubscribeEvent
-    public void onOverlay(RenderGameOverlayEvent.Post e) {
-        if(e.getType() != ElementType.ALL)return;
+    public void onOverlay(RenderGuiEvent.Post e) {
         renderer.render(e.getPartialTick());
     }
     
