@@ -1,5 +1,5 @@
 version: '0.0.1'
-source: "https://github.com/tr7zw/ForgeFabricComposeTemplate/tree/1.19.1/"
+source: "https://github.com/tr7zw/ForgeFabricComposeTemplate/tree/1.19.3-mcpublish/"
 replacements:
   group: "dev.tr7zw"
   name: "Paperdoll"
@@ -10,6 +10,8 @@ replacements:
   dependencies: '
   '
   licensename: "LICENSE"
+  modrinthid: "edwFXb9k"
+  curseforgeid: "537079"
 rootProject:
   template: "."
 subProjects:

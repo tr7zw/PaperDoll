@@ -1,10 +1,11 @@
 package dev.tr7zw.paperdoll;
 
+import org.joml.Quaternionf;
+
 import com.mojang.blaze3d.platform.Lighting;
 import com.mojang.blaze3d.systems.RenderSystem;
 import com.mojang.blaze3d.vertex.PoseStack;
-import com.mojang.math.Quaternion;
-import com.mojang.math.Vector3f;
+import com.mojang.math.Axis;
 
 import dev.tr7zw.paperdoll.PaperDollSettings.DollHeadMode;
 import net.minecraft.client.CameraType;
@@ -123,8 +124,8 @@ public class PaperDollRenderer {
         PoseStack matrixStack = new PoseStack();
         matrixStack.translate(0.0D, 0.0D, 1000.0D);
         matrixStack.scale((float) size, (float) size, (float) size);
-        Quaternion quaternion = Vector3f.ZP.rotationDegrees(180.0F);
-        Quaternion quaternion2 = Vector3f.XP.rotationDegrees(rotationUp * 20.0F);
+        Quaternionf quaternion = Axis.ZP.rotationDegrees(180.0F);
+        Quaternionf quaternion2 = Axis.XP.rotationDegrees(rotationUp * 20.0F);
         quaternion.mul(quaternion2);
         matrixStack.mulPose(quaternion);
         float yBodyRot = livingEntity.yBodyRot;
@@ -167,7 +168,7 @@ public class PaperDollRenderer {
         }
         Lighting.setupForEntityInInventory();
         EntityRenderDispatcher entityRenderDispatcher = mc_instance.getEntityRenderDispatcher();
-        quaternion2.conj();
+        quaternion2.conjugate();
         entityRenderDispatcher.overrideCameraOrientation(quaternion2);
         entityRenderDispatcher.setRenderShadow(false);
         MultiBufferSource.BufferSource bufferSource = Minecraft.getInstance().renderBuffers().bufferSource();
@@ -224,8 +225,8 @@ public class PaperDollRenderer {
         PoseStack matrixStack = new PoseStack();
         matrixStack.translate(0.0D, 0.0D, 1000.0D);
         matrixStack.scale((float) size, (float) size, (float) size);
-        Quaternion quaternion = Vector3f.ZP.rotationDegrees(180.0F);
-        Quaternion quaternion2 = Vector3f.XP.rotationDegrees(rotationUp * 20.0F);
+        Quaternionf quaternion = Axis.ZP.rotationDegrees(180.0F);
+        Quaternionf quaternion2 = Axis.XP.rotationDegrees(rotationUp * 20.0F);
         quaternion.mul(quaternion2);
         matrixStack.mulPose(quaternion);
         float yRot = entity.getYRot();
@@ -246,7 +247,7 @@ public class PaperDollRenderer {
         }
         Lighting.setupForEntityInInventory();
         EntityRenderDispatcher entityRenderDispatcher = mc_instance.getEntityRenderDispatcher();
-        quaternion2.conj();
+        quaternion2.conjugate();
         entityRenderDispatcher.overrideCameraOrientation(quaternion2);
         entityRenderDispatcher.setRenderShadow(false);
         MultiBufferSource.BufferSource bufferSource = Minecraft.getInstance().renderBuffers().bufferSource();
