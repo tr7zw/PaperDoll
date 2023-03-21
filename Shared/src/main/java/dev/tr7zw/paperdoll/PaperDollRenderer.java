@@ -115,7 +115,7 @@ public class PaperDollRenderer {
         float rotationUp = (float) Math.atan((double) (lookUpDown / 40.0F));
         PoseStack poseStack = RenderSystem.getModelViewStack();
         poseStack.pushPose();
-        if (mc_instance.player.isFallFlying() || mc_instance.player.isAutoSpinAttack()) {
+        if (livingEntity.isFallFlying() || livingEntity.isAutoSpinAttack()) {
             ypos -= (90f + livingEntity.xRotO) / 90f * (size) - 5;
         }
         poseStack.translate(xpos, ypos, 1050.0D);
@@ -136,23 +136,28 @@ public class PaperDollRenderer {
         float xRotO = livingEntity.xRotO;
         float yHeadRotO = livingEntity.yHeadRotO;
         float yHeadRot = livingEntity.yHeadRot;
-        Vec3 vel = livingEntity.getDeltaMovement();
+        Vec3 deltaMovement = livingEntity.getDeltaMovement();
         float vehicleYBodyRot = 0;
         float vehicleYBodyRotO = 0;
         livingEntity.yBodyRot = 180.0F + rotationSide * 20.0F;
         livingEntity.setYRot(180.0F + rotationSide * 40.0F);
         livingEntity.yBodyRotO = livingEntity.yBodyRot;
         livingEntity.yRotO = livingEntity.getYRot();
+        Vec3 lastDeltaMovement = null;
+        if(livingEntity instanceof PlayerAccess player) {
+            lastDeltaMovement = player.getLastDelataMovement();
+            player.setLastDeletaMovement(Vec3.ZERO);
+        }
         if (livingEntity.isPassenger() && livingEntity.getVehicle() instanceof LivingEntity livingVehicle) {
             vehicleYBodyRot = livingVehicle.yBodyRot;
             vehicleYBodyRotO = livingVehicle.yBodyRotO;
             livingVehicle.yBodyRot = livingEntity.yBodyRot;
             livingVehicle.yBodyRotO = livingEntity.yBodyRotO;
         }
-        if (mc_instance.player.isFallFlying() || mc_instance.player.isAutoSpinAttack()) {
+        if (livingEntity.isFallFlying() || livingEntity.isAutoSpinAttack()) {
             livingEntity.setDeltaMovement(Vec3.ZERO);
         }
-        if (lockHead) {
+        if (lockHead || livingEntity.isFallFlying() || livingEntity.isAutoSpinAttack()) {
             livingEntity.setXRot(-rotationUp * 20.0F);
             livingEntity.xRotO = livingEntity.getXRot();
             livingEntity.yHeadRot = livingEntity.getYRot();
@@ -192,6 +197,9 @@ public class PaperDollRenderer {
                 15728880);
         bufferSource.endBatch();
         entityRenderDispatcher.setRenderShadow(true);
+        if(livingEntity instanceof PlayerAccess player) {
+            player.setLastDeletaMovement(lastDeltaMovement);
+        }
         livingEntity.yBodyRot = yBodyRot;
         livingEntity.yBodyRotO = yBodyRotO;
         livingEntity.setYRot(yRot);
@@ -200,7 +208,7 @@ public class PaperDollRenderer {
         livingEntity.xRotO = xRotO;
         livingEntity.yHeadRotO = yHeadRotO;
         livingEntity.yHeadRot = yHeadRot;
-        livingEntity.setDeltaMovement(vel);
+        livingEntity.setDeltaMovement(deltaMovement);
         if (livingEntity.isPassenger() && livingEntity.getVehicle() instanceof LivingEntity livingVehicle) {
             livingVehicle.yBodyRot = vehicleYBodyRot;
             livingVehicle.yBodyRotO = vehicleYBodyRotO;

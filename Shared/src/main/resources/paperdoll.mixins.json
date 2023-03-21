@@ -6,7 +6,8 @@
   "mixins": [
   ],
   "client": [
-    "GuiMixin"
+    "GuiMixin",
+    "AbstractClientPlayerMixin"
   ],
   "injectors": {
     "defaultRequire": 1
