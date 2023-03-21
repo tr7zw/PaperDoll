@@ -1,0 +1,13 @@
+[20:58:18] [Test worker/INFO]: Building unoptimized datafixer
+[20:58:19] [Test worker/INFO]: [STDOUT]: text.paperdoll.enabled.tooltip Enables the PaperDoll mod
+[20:58:19] [Test worker/INFO]: [STDOUT]: text.paperdoll.enabled "PaperDoll" enabled
+[20:58:19] [Test worker/INFO]: [STDOUT]: text.paperdoll.location Doll Location
+[20:58:19] [Test worker/INFO]: [STDOUT]: text.paperdoll.location.tooltip Switch between the 4 screen corners
+[20:58:19] [Test worker/INFO]: [STDOUT]: text.paperdoll.xOffset Doll X Offset
+[20:58:19] [Test worker/INFO]: [STDOUT]: text.paperdoll.xOffset.tooltip Moves the doll left/right
+[20:58:19] [Test worker/INFO]: [STDOUT]: text.paperdoll.size Doll Size
+[20:58:19] [Test worker/INFO]: [STDOUT]: text.paperdoll.size.tooltip Change the scale of the doll
+[20:58:19] [Test worker/INFO]: [STDOUT]: text.paperdoll.lookingUpDown Doll looking Up/Down
+[20:58:19] [Test worker/INFO]: [STDOUT]: text.paperdoll.lookingUpDown.tooltip Change how much the (locked) head looks Up/Down
+[20:58:19] [Test worker/INFO]: [STDOUT]: text.paperdoll.hideInF5 Hide In F5
+[20:58:19] [Test worker/INFO]: [STDOUT]: text.paperdoll.hideInF5.tooltip Hides the doll while in F5 mode
