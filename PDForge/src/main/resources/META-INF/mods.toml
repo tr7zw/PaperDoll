@@ -11,24 +11,24 @@ issueTrackerURL="https://github.com/tr7zw/PaperDoll/issues" #optional
 
 [[mods]]
 modId = "paperdoll"
-version = "${version}"
+version = "1.1.1"
 displayName = "PaperDoll"
 logoFile="icon.png" #optional
- authors="tr7zw" #optional
+authors="tr7zw" #optional
 description = '''
 Shows a small preview of the player in a corner of the screen.
 '''
 
+[[dependencies.paperdoll]] #optional
+    modId="forge"
+    mandatory=true
+    versionRange="[35,)"
+    ordering="NONE"
+    side="CLIENT"
+# Here's another dependency
 [[dependencies.paperdoll]]
-modId = "forge"
-mandatory = true # do you **need** this mod to be able to launch?
-versionRange = "[36,)" # This essentially means any forge >= 36
-ordering = "NONE" # Use this if you want your mod to be loaded specifically BEFORE or AFTER another mod
-side = "BOTH" # Specify where this mod is required: can be BOTH, CLIENT or SERVER
-
-[[dependencies.paperdoll]]
-modId = "minecraft"
-mandatory = true
-versionRange = "[1.19.4,)"
-ordering = "NONE"
-side = "BOTH"
+    modId="minecraft"
+    mandatory=true
+    versionRange="[1.20,)"
+    ordering="NONE"
+    side="CLIENT"

@@ -12,12 +12,12 @@ import org.apache.logging.log4j.Logger;
 
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
-import com.mojang.blaze3d.vertex.PoseStack;
 
 import dev.tr7zw.config.CustomConfigScreen;
 import dev.tr7zw.paperdoll.PaperDollSettings.DollHeadMode;
 import dev.tr7zw.paperdoll.PaperDollSettings.PaperDollLocation;
 import net.minecraft.client.OptionInstance;
+import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.screens.Screen;
 
 public class PaperDollShared {
@@ -84,8 +84,8 @@ public class PaperDollShared {
             }
 
             @Override
-            public void render(PoseStack poseStack, int i, int j, float f) {
-                super.render(poseStack, i, j, f);
+            public void render(GuiGraphics guiGraphics, int i, int j, float f) {
+                super.render(guiGraphics, i, j, f);
                 renderer.render(f);
             }
 

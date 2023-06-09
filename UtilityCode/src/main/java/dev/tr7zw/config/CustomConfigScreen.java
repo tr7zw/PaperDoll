@@ -6,11 +6,11 @@ import java.util.Map;
 import java.util.function.Consumer;
 import java.util.function.Supplier;
 
-import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.serialization.Codec;
 
 import net.minecraft.client.OptionInstance;
 import net.minecraft.client.OptionInstance.TooltipSupplier;
+import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.components.Button;
 import net.minecraft.client.gui.components.Button.OnPress;
 import net.minecraft.client.gui.components.OptionsList;
@@ -73,11 +73,11 @@ public abstract class CustomConfigScreen extends Screen {
         }).pos(this.width / 2 + 110, this.height - 27).size(60, 20).build());
     }
 
-    public void render(PoseStack poseStack, int i, int j, float f) {
-        this.renderBackground(poseStack);
-        this.list.render(poseStack, i, j, f);
-        drawCenteredString(poseStack, this.font, this.title, this.width / 2, 20, 16777215);
-        super.render(poseStack, i, j, f);
+    public void render(GuiGraphics guiGraphics, int i, int j, float f) {
+        this.renderBackground(guiGraphics);
+        this.list.render(guiGraphics, i, j, f);
+        guiGraphics.drawCenteredString(this.font, this.title, this.width / 2, 20, 16777215);
+        super.render(guiGraphics, i, j, f);
     }
 
     private <T> TooltipSupplier<T>  getOptionalTooltip(String translationKey) {

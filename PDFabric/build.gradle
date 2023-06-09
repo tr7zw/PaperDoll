@@ -4,7 +4,7 @@ dependencies {
 	modImplementation "net.fabricmc:fabric-loader:${rootProject.fabric_loader_version}"
     modImplementation "net.fabricmc.fabric-api:fabric-api:${rootProject.fabric_api_version}"
     
-    modImplementation "curse.maven:modmenu-308702:${rootProject.mod_menu_release}"
+    modImplementation "maven.modrinth:modmenu:${rootProject.mod_menu_release}"
 
     sourceSets.main.java.srcDirs += "${project.rootDir}/Shared/src/main/java"
 	sourceSets.main.resources.srcDirs += "${project.rootDir}/Shared/src/main/resources"
