@@ -1,9 +1,9 @@
 version: '0.0.2'
-source: "https://github.com/tr7zw/ModComposeTemplate/tree/1.20"
+source: "https://github.com/tr7zw/ModComposeTemplate/tree/1.20.2"
 replacements:
   name: "Paperdoll"
   id: "paperdoll"
-  version: "1.1.1"
+  version: "1.1.2"
   relocationpackage: "dev.tr7zw.paperdoll"
   modrinthid: "edwFXb9k"
   curseforgeid: "537079"
