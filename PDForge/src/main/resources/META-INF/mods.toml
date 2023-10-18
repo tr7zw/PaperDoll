@@ -29,6 +29,6 @@ Shows a small preview of the player in a corner of the screen.
 [[dependencies.paperdoll]]
     modId="minecraft"
     mandatory=true
-    versionRange="[1.20,)"
+    versionRange="[1.20.2,)"
     ordering="NONE"
     side="CLIENT"

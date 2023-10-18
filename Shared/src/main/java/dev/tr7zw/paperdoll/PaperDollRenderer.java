@@ -25,7 +25,7 @@ public class PaperDollRenderer {
     private long showTill = 0;
 
     public void render(float delta) {
-        if (!instance.settings.dollEnabled || mc_instance.options.renderDebug || mc_instance.level == null) {
+        if (!instance.settings.dollEnabled || mc_instance.getDebugOverlay().showDebugScreen() || mc_instance.level == null) {
             return;
         }
 
