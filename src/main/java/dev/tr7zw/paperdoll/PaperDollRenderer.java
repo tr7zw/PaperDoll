@@ -1,5 +1,14 @@
 package dev.tr7zw.paperdoll;
 
+import java.util.stream.Stream;
+
+//spotless:off
+//#if MC >= 11903
+import org.joml.Quaternionf;
+//#else
+//$$ import com.mojang.math.Quaternion;
+//#endif
+
 import com.mojang.blaze3d.platform.Lighting;
 import com.mojang.blaze3d.systems.RenderSystem;
 import com.mojang.blaze3d.vertex.PoseStack;
@@ -10,18 +19,10 @@ import net.minecraft.client.CameraType;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.MultiBufferSource;
 import net.minecraft.client.renderer.entity.EntityRenderDispatcher;
-import net.minecraft.util.Mth;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.vehicle.Minecart;
 import net.minecraft.world.phys.Vec3;
-
-//spotless:off
-//#if MC >= 11903
-import org.joml.Quaternionf;
-//#else
-//$$ import com.mojang.math.Quaternion;
-//#endif
 
 public class PaperDollRenderer {
 
@@ -77,10 +78,15 @@ public class PaperDollRenderer {
                 hide = false;
             }
             // combat
-            if (livingEntity.isBlocking() || livingEntity.isUsingItem() || livingEntity.isInPowderSnow
-                    || livingEntity.swinging || livingEntity.isOnFire() || livingEntity.hurtTime > 0) {
+            if (livingEntity.isBlocking() || livingEntity.isUsingItem() || livingEntity.swinging
+                    || livingEntity.isOnFire() || livingEntity.hurtTime > 0) {
                 hide = false;
             }
+            // spotless:off
+        	//#if MC >= 11700
+            if(livingEntity.isInPowderSnow)hide = false;
+            //#endif
+            // spotless:on
 
             if (hide && System.currentTimeMillis() > showTill) {
                 return;
@@ -95,7 +101,7 @@ public class PaperDollRenderer {
 
         if (playerEntity.isPassenger()) {
             Entity vehicle = playerEntity.getRootVehicle();
-            vehicle.getPassengersAndSelf().forEachOrdered(entity -> {
+            getPassengersAndSelf(vehicle).forEachOrdered(entity -> {
                 double yOffset = fYpos;
                 if (entity != playerEntity)
                     yOffset += (playerEntity.getY() - entity.getY()) * size;
@@ -120,19 +126,23 @@ public class PaperDollRenderer {
 
     }
 
+    public Stream<Entity> getPassengersAndSelf(Entity vehicle) {
+        return Stream.concat(vehicle.getPassengers().stream(), Stream.of(vehicle));
+    }
+
     // Modified version from InventoryScreen
     private void drawLivingEntity(double xpos, double ypos, int size, float lookSides, float lookUpDown,
             LivingEntity livingEntity, float delta, boolean lockHead) {
         float rotationSide = (float) Math.atan((double) (lookSides / 40.0F));
         float rotationUp = (float) Math.atan((double) (lookUpDown / 40.0F));
-        PoseStack poseStack = RenderSystem.getModelViewStack();
+        PoseStack poseStack = getPoseStack();
         poseStack.pushPose();
         if (livingEntity.isFallFlying() || livingEntity.isAutoSpinAttack()) {
             ypos -= (90f + livingEntity.xRotO) / 90f * (size) - 5;
         }
         poseStack.translate(xpos, ypos, 1050.0D);
         poseStack.scale(1.0F, 1.0F, -1.0F);
-        RenderSystem.applyModelViewMatrix();
+        prepareViewMatrix(xpos, ypos);
         PoseStack matrixStack = new PoseStack();
         matrixStack.translate(0.0D, 0.0D, 1000.0D);
         matrixStack.scale((float) size, (float) size, (float) size);
@@ -148,10 +158,10 @@ public class PaperDollRenderer {
         quaternion.mul(quaternion2);
         matrixStack.mulPose(quaternion);
         float yBodyRot = livingEntity.yBodyRot;
-        float yRot = livingEntity.getYRot();
+        float yRot = NMSHelper.getYRot(livingEntity);
         float yRotO = livingEntity.yRotO;
         float yBodyRotO = livingEntity.yBodyRotO;
-        float xRot = livingEntity.getXRot();
+        float xRot = NMSHelper.getXRot(livingEntity);
         float xRotO = livingEntity.xRotO;
         float yHeadRotO = livingEntity.yHeadRotO;
         float yHeadRot = livingEntity.yHeadRot;
@@ -159,9 +169,9 @@ public class PaperDollRenderer {
         float vehicleYBodyRot = 0;
         float vehicleYBodyRotO = 0;
         livingEntity.yBodyRot = 180.0F + rotationSide * 20.0F;
-        livingEntity.setYRot(180.0F + rotationSide * 40.0F);
+        NMSHelper.setYRot(livingEntity, 180.0F + rotationSide * 40.0F);
         livingEntity.yBodyRotO = livingEntity.yBodyRot;
-        livingEntity.yRotO = livingEntity.getYRot();
+        livingEntity.yRotO = NMSHelper.getYRot(livingEntity);
         Vec3 lastDeltaMovement = null;
         if (livingEntity instanceof PlayerAccess player) {
             lastDeltaMovement = player.getLastDelataMovement();
@@ -177,10 +187,10 @@ public class PaperDollRenderer {
             livingEntity.setDeltaMovement(Vec3.ZERO);
         }
         if (lockHead || livingEntity.isFallFlying() || livingEntity.isAutoSpinAttack()) {
-            livingEntity.setXRot(-rotationUp * 20.0F);
-            livingEntity.xRotO = livingEntity.getXRot();
-            livingEntity.yHeadRot = livingEntity.getYRot();
-            livingEntity.yHeadRotO = livingEntity.getYRot();
+            NMSHelper.setXRot(livingEntity, -rotationUp * 20.0F);
+            livingEntity.xRotO = NMSHelper.getXRot(livingEntity);
+            livingEntity.yHeadRot = NMSHelper.getYRot(livingEntity);
+            livingEntity.yHeadRotO = NMSHelper.getYRot(livingEntity);
         } else {
             if (instance.settings.dollHeadMode == DollHeadMode.FREE) {
                 livingEntity.yHeadRot = 180.0F + rotationSide * 40.0F - (yBodyRot - yHeadRot);
@@ -190,15 +200,9 @@ public class PaperDollRenderer {
                 livingEntity.yHeadRotO = 180.0F + rotationSide * 40.0F - (yRotO - yHeadRotO);
             }
         }
-        Lighting.setupForEntityInInventory();
+        prepareLighting();
         EntityRenderDispatcher entityRenderDispatcher = mc_instance.getEntityRenderDispatcher();
-        // spotless:off
-    	//#if MC >= 11903
-        quaternion2.conjugate();
-        //#else
-        //$$ quaternion2.conj();
-        //#endif
-        // spotless:on
+        conjugate(quaternion2);
         entityRenderDispatcher.overrideCameraOrientation(quaternion2);
         entityRenderDispatcher.setRenderShadow(false);
         MultiBufferSource.BufferSource bufferSource = Minecraft.getInstance().renderBuffers().bufferSource();
@@ -209,8 +213,8 @@ public class PaperDollRenderer {
             Entity vehicle = livingEntity.getVehicle();
             double offsetXTmp = livingEntity.getX() - vehicle.getX();
             double offsetZTmp = livingEntity.getZ() - vehicle.getZ();
-            float rotation = vehicle.getYRot() - 180 - rotationSide * 20.0F; // target is 180
-            rotation *= Mth.DEG_TO_RAD;
+            float rotation = NMSHelper.getYRot(vehicle) - 180 - rotationSide * 20.0F; // target is 180
+            rotation *= NMSHelper.DEG_TO_RAD;
             rotation *= -1;
             offsetX += Math.cos(rotation) * offsetXTmp - Math.sin(rotation) * offsetZTmp;
             offsetZ += Math.sin(rotation) * offsetXTmp + Math.cos(rotation) * offsetZTmp;
@@ -227,9 +231,9 @@ public class PaperDollRenderer {
         }
         livingEntity.yBodyRot = yBodyRot;
         livingEntity.yBodyRotO = yBodyRotO;
-        livingEntity.setYRot(yRot);
+        NMSHelper.setYRot(livingEntity, yRot);
         livingEntity.yRotO = yRotO;
-        livingEntity.setXRot(xRot);
+        NMSHelper.setXRot(livingEntity, xRot);
         livingEntity.xRotO = xRotO;
         livingEntity.yHeadRotO = yHeadRotO;
         livingEntity.yHeadRot = yHeadRot;
@@ -239,22 +243,80 @@ public class PaperDollRenderer {
             livingVehicle.yBodyRotO = vehicleYBodyRotO;
         }
         poseStack.popPose();
-        RenderSystem.applyModelViewMatrix();
+        resetViewMatrix();
+        // #else
+        // $$ Lighting.setupFor3DItems();
+        // #endif
+        // spotless:on
         Lighting.setupFor3DItems();
+    }
+
+    private void prepareViewMatrix(double xpos, double ypos) {
+        // spotless:off
+    	//#if MC >= 11700
+        RenderSystem.applyModelViewMatrix();
+        //#else
+        //$$ RenderSystem.pushMatrix();
+        //$$ RenderSystem.translatef((float)xpos, (float)ypos, 1050.0F);
+        //$$ RenderSystem.scalef(1.0F, 1.0F, -1.0F);
+        //#endif
+        // spotless:on
+    }
+
+    private void resetViewMatrix() {
+        // spotless:off
+    	//#if MC >= 11700
+        RenderSystem.applyModelViewMatrix();
+        //#else
+        //$$ RenderSystem.popMatrix();
+        //#endif
+        // spotless:on
+    }
+
+    private void prepareLighting() {
+        // spotless:off
+    	//#if MC >= 11700
+        Lighting.setupForEntityInInventory();
+        //#else
+        //$$ Lighting.setupForFlatItems();
+        //#endif
+        // spotless:on
+    }
+
+    // spotless:off
+    	//#if MC >= 11903
+        private void conjugate(Quaternionf quaternion2) {
+        quaternion2.conjugate();
+        //#else
+        //$$     private void conjugate(Quaternion quaternion2) {
+        //$$ quaternion2.conj();
+        //#endif
+        // spotless:on
+    }
+
+    private PoseStack getPoseStack() {
+        // spotless:off
+    	//#if MC >= 11700
+        PoseStack poseStack = RenderSystem.getModelViewStack();
+        //#else
+        //$$ PoseStack poseStack = new PoseStack();
+        //#endif
+        // spotless:on
+        return poseStack;
     }
 
     private void drawEntity(double xpos, double ypos, int size, float lookSides, float lookUpDown, Entity entity,
             float delta, boolean lockHead) {
         float rotationSide = (float) Math.atan((double) (lookSides / 40.0F));
         float rotationUp = (float) Math.atan((double) (lookUpDown / 40.0F));
-        PoseStack poseStack = RenderSystem.getModelViewStack();
+        PoseStack poseStack = getPoseStack();
         poseStack.pushPose();
         if (mc_instance.player.isFallFlying() || mc_instance.player.isAutoSpinAttack()) {
             ypos -= (90f + entity.xRotO) / 90f * (size) - 5;
         }
         poseStack.translate(xpos, ypos, 1050.0D);
         poseStack.scale(1.0F, 1.0F, -1.0F);
-        RenderSystem.applyModelViewMatrix();
+        prepareViewMatrix(xpos, ypos);
         PoseStack matrixStack = new PoseStack();
         matrixStack.translate(0.0D, 0.0D, 1000.0D);
         matrixStack.scale((float) size, (float) size, (float) size);
@@ -269,31 +331,29 @@ public class PaperDollRenderer {
         // spotless:on
         quaternion.mul(quaternion2);
         matrixStack.mulPose(quaternion);
-        float yRot = entity.getYRot();
+        float yRot = NMSHelper.getYRot(entity);
         float yRotO = entity.yRotO;
-        float xRot = entity.getXRot();
+        float xRot = NMSHelper.getXRot(entity);
         float xRotO = entity.xRotO;
         Vec3 vel = entity.getDeltaMovement();
         Vec3 pos = entity.position();
         double yOld = entity.yOld;
-        entity.setYRot(0);
-        entity.yRotO = entity.getYRot();
+        NMSHelper.setYRot(entity, 0);
+        entity.yRotO = NMSHelper.getYRot(entity);
         entity.setDeltaMovement(Vec3.ZERO);
-        entity.setPos(pos.add(0, 500, 0)); // hack to disconnect minecarts from rails for the rendering
-        entity.yOld += 500;
-        if (lockHead) {
-            entity.setXRot(-rotationUp * 20.0F);
-            entity.xRotO = entity.getXRot();
-        }
-        Lighting.setupForEntityInInventory();
-        EntityRenderDispatcher entityRenderDispatcher = mc_instance.getEntityRenderDispatcher();
         // spotless:off
-        //#if MC >= 11903
-        quaternion2.conjugate();
-        //#else
-        //$$ quaternion2.conj();
+    	//#if MC >= 11700
+        entity.setPos(pos.add(0, 500, 0)); // hack to disconnect minecarts from rails for the rendering
         //#endif
         // spotless:on
+        entity.yOld += 500;
+        if (lockHead) {
+            NMSHelper.setXRot(entity, -rotationUp * 20.0F);
+            entity.xRotO = NMSHelper.getXRot(entity);
+        }
+        prepareLighting();
+        EntityRenderDispatcher entityRenderDispatcher = mc_instance.getEntityRenderDispatcher();
+        conjugate(quaternion2);
         entityRenderDispatcher.overrideCameraOrientation(quaternion2);
         entityRenderDispatcher.setRenderShadow(false);
         MultiBufferSource.BufferSource bufferSource = Minecraft.getInstance().renderBuffers().bufferSource();
@@ -307,15 +367,19 @@ public class PaperDollRenderer {
                 matrixStack, bufferSource, 15728880);
         bufferSource.endBatch();
         entityRenderDispatcher.setRenderShadow(true);
-        entity.setYRot(yRot);
+        NMSHelper.setYRot(entity, yRot);
         entity.yRotO = yRotO;
-        entity.setXRot(xRot);
+        NMSHelper.setXRot(entity, xRot);
         entity.xRotO = xRotO;
         entity.setDeltaMovement(vel);
+        // spotless:off
+    	//#if MC >= 11700
         entity.setPos(pos);
+        //#endif
+        // spotless:on
         entity.yOld = yOld;
         poseStack.popPose();
-        RenderSystem.applyModelViewMatrix();
+        resetViewMatrix();
         Lighting.setupFor3DItems();
     }
 
