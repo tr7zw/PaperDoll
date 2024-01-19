@@ -20,6 +20,11 @@ import net.minecraft.client.gui.components.Tooltip;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.network.chat.CommonComponents;
 import net.minecraft.network.chat.Component;
+//spotless:off 
+//#if MC <= 11904
+//$$ import com.mojang.blaze3d.vertex.PoseStack;
+//#endif
+//spotless:on
 
 public abstract class CustomConfigScreen extends Screen {
 
@@ -46,7 +51,13 @@ public abstract class CustomConfigScreen extends Screen {
     }
 
     protected void init() {
-        this.list = new OptionsList(this.minecraft, this.width, this.height, 32, this.height - 32, 25);
+        // spotless:off
+        //#if MC <= 12002
+        //$$ this.list = new OptionsList(this.minecraft, this.width, this.height, 32, this.height - 32, 25);
+        //#else
+        this.list = new OptionsList(this.minecraft, this.width, this.height - 64, 32, 25);
+        //#endif
+        // spotless:on
         this.addWidget(this.list);
         this.createFooter();
         initialize();
@@ -83,17 +94,38 @@ public abstract class CustomConfigScreen extends Screen {
                 }, minecraft.font));
     }
 
+    // spotless:off 
+    //#if MC >= 12001
     public void render(GuiGraphics guiGraphics, int i, int j, float f) {
+    	//#if MC >= 12002
         super.render(guiGraphics, i, j, f);
+        //#else
+        //$$ this.renderBackground(guiGraphics);
+        //#endif
         this.list.render(guiGraphics, i, j, f);
         guiGraphics.drawCenteredString(this.font, this.title, this.width / 2, 20, 16777215);
+        //#if MC <= 12001
+        //$$ super.render(guiGraphics, i, j, f);
+        //#endif
     }
+    //#else
+    //$$ public void render(PoseStack poseStack, int i, int j, float f) {
+    //$$    this.renderBackground(poseStack);
+    //$$    this.list.render(poseStack, i, j, f);
+    //$$    drawCenteredString(poseStack, this.font, this.title, this.width / 2, 20, 16777215);
+    //$$    super.render(poseStack, i, j, f);
+    //$$ }
+    //#endif
 
+
+    //#if MC >= 12002
     @Override
     public void renderTransparentBackground(GuiGraphics guiGraphics) {
         // we always want the dirt background
         renderDirtBackground(guiGraphics);
     }
+    //#endif
+    // spotless:on
 
     private <T> TooltipSupplier<T> getOptionalTooltip(String translationKey) {
         return new TooltipSupplier<T>() {

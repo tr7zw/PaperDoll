@@ -37,6 +37,8 @@ run/
 *.gradle
 *.properties
 gradle/wrapper
-VersionShared
+VersionShared/*
 PDFabric/logs/
 UtilityCode
+*.log
+formatter.xml

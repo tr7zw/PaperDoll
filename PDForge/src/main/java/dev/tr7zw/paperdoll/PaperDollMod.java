@@ -14,7 +14,7 @@ public class PaperDollMod extends PaperDollShared {
     public PaperDollMod() {
         try {
             Class clientClass = net.minecraft.client.Minecraft.class;
-        }catch(Throwable ex) {
+        } catch (Throwable ex) {
             LOGGER.warn("PaperDoll Mod installed on a Server. Going to sleep.");
             return;
         }
@@ -22,9 +22,10 @@ public class PaperDollMod extends PaperDollShared {
                 () -> new IExtensionPoint.DisplayTest(
                         () -> ModLoadingContext.get().getActiveContainer().getModInfo().getVersion().toString(),
                         (remote, isServer) -> true));
-        ModLoadingContext.get().registerExtensionPoint(ConfigScreenFactory.class, () -> new ConfigScreenFactory((mc, screen) -> {
-            return createConfigScreen(screen);
-        }));
+        ModLoadingContext.get().registerExtensionPoint(ConfigScreenFactory.class,
+                () -> new ConfigScreenFactory((mc, screen) -> {
+                    return createConfigScreen(screen);
+                }));
         init();
         MinecraftForge.EVENT_BUS.addListener(this::onOverlay);
     }
@@ -33,5 +34,5 @@ public class PaperDollMod extends PaperDollShared {
     public void onOverlay(RenderGuiEvent.Post e) {
         renderer.render(e.getPartialTick());
     }
-    
+
 }

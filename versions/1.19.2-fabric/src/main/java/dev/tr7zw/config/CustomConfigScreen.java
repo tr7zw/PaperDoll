@@ -2,24 +2,26 @@ package dev.tr7zw.config;
 
 import java.util.Arrays;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.function.Consumer;
 import java.util.function.Supplier;
 
+import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.serialization.Codec;
 
-import net.minecraft.Util;
+import dev.tr7zw.util.ComponentProvider;
+import net.minecraft.client.Minecraft;
 import net.minecraft.client.OptionInstance;
 import net.minecraft.client.OptionInstance.TooltipSupplier;
-import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.components.Button;
 import net.minecraft.client.gui.components.Button.OnPress;
 import net.minecraft.client.gui.components.OptionsList;
-import net.minecraft.client.gui.components.PlainTextButton;
-import net.minecraft.client.gui.components.Tooltip;
+import net.minecraft.client.gui.screens.OptionsSubScreen;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.network.chat.CommonComponents;
 import net.minecraft.network.chat.Component;
+import net.minecraft.util.FormattedCharSequence;
 
 public abstract class CustomConfigScreen extends Screen {
 
@@ -27,7 +29,7 @@ public abstract class CustomConfigScreen extends Screen {
     private OptionsList list;
 
     public CustomConfigScreen(Screen lastScreen, String title) {
-        super(Component.translatable(title));
+        super(ComponentProvider.translatable(title));
         this.lastScreen = lastScreen;
     }
 
@@ -59,54 +61,55 @@ public abstract class CustomConfigScreen extends Screen {
     public abstract void save();
 
     protected void createFooter() {
-        this.addRenderableWidget(Button.builder(CommonComponents.GUI_DONE, new OnPress() {
-            @Override
-            public void onPress(Button button) {
-                CustomConfigScreen.this.onClose();
-            }
-        }).pos(this.width / 2 - 100, this.height - 27).size(200, 20).build());
+        this.addRenderableWidget(
+                new Button(this.width / 2 - 100, this.height - 27, 200, 20, CommonComponents.GUI_DONE, new OnPress() {
 
-        this.addRenderableWidget(Button.builder(Component.translatable("controls.reset"), new OnPress() {
-            @Override
-            public void onPress(Button button) {
-                reset();
-                CustomConfigScreen.this.resize(minecraft, width, height); // refresh
-            }
-        }).pos(this.width / 2 + 110, this.height - 27).size(60, 20).build());
-
-        this.addRenderableWidget(new PlainTextButton(5, 5, 400, 20,
-                Component.literal("Enjoying the mod? Consider supporting the developer!"), new OnPress() {
                     @Override
                     public void onPress(Button button) {
-                        Util.getPlatform().openUri("https://tr7zw.dev/donate/");
+                        CustomConfigScreen.this.onClose();
                     }
-                }, minecraft.font));
+                }));
+        this.addRenderableWidget(new Button(this.width / 2 + 110, this.height - 27, 60, 20,
+                ComponentProvider.translatable("controls.reset"), new OnPress() {
+
+                    @Override
+                    public void onPress(Button button) {
+                        reset();
+                        CustomConfigScreen.this.resize(minecraft, width, height); // refresh
+                    }
+                }));
     }
 
-    public void render(GuiGraphics guiGraphics, int i, int j, float f) {
-        super.render(guiGraphics, i, j, f);
-        this.list.render(guiGraphics, i, j, f);
-        guiGraphics.drawCenteredString(this.font, this.title, this.width / 2, 20, 16777215);
+    public void render(PoseStack poseStack, int i, int j, float f) {
+        this.renderBackground(poseStack);
+        this.list.render(poseStack, i, j, f);
+        drawCenteredString(poseStack, this.font, this.title, this.width / 2, 20, 16777215);
+        super.render(poseStack, i, j, f);
+        List<FormattedCharSequence> list = OptionsSubScreen.tooltipAt(this.list, i, j);
+        if (list != null)
+            this.renderTooltip(poseStack, list, i, j);
     }
 
-    @Override
-    public void renderTransparentBackground(GuiGraphics guiGraphics) {
-        // we always want the dirt background
-        renderDirtBackground(guiGraphics);
-    }
-
-    private <T> TooltipSupplier<T> getOptionalTooltip(String translationKey) {
-        return new TooltipSupplier<T>() {
-
+    // Mojang?!?
+    private <T> net.minecraft.client.OptionInstance.TooltipSupplierFactory<T> getOptionalTooltip(
+            String translationKey) {
+        return new net.minecraft.client.OptionInstance.TooltipSupplierFactory<T>() {
             @Override
-            public Tooltip apply(T param1t) {
-                String key = translationKey + ".tooltip";
-                Component comp = Component.translatable(key);
-                if (key.equals(comp.getString())) {
-                    return null;
-                } else {
-                    return Tooltip.create(comp);
-                }
+            public TooltipSupplier<T> apply(Minecraft t) {
+                return new TooltipSupplier<T>() {
+
+                    @Override
+                    public List<FormattedCharSequence> apply(T param1t) {
+                        String key = translationKey + ".tooltip";
+                        Component comp = ComponentProvider.translatable(key);
+                        if (key.equals(comp.getString())) {
+                            return null;
+                        } else {
+                            return minecraft.font.split(comp, 170);
+                        }
+                    }
+
+                };
             }
         };
     }
@@ -150,7 +153,7 @@ public abstract class CustomConfigScreen extends Screen {
         Map<String, T> mapping = new HashMap<>();
         Arrays.asList(targetEnum.getEnumConstants()).forEach(t -> mapping.put(t.name(), t));
         return new OptionInstance<T>(translationKey, getOptionalTooltip(translationKey),
-                (comp, t) -> Component.translatable(translationKey + "." + t.name()),
+                (comp, t) -> ComponentProvider.translatable(translationKey + "." + t.name()),
                 new OptionInstance.Enum<T>(Arrays.asList(targetEnum.getEnumConstants()),
                         Codec.STRING.xmap(s -> mapping.get(s), e -> e.name())),
                 current.get(), update);
