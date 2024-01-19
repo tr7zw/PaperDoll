@@ -199,15 +199,14 @@ public abstract class CustomConfigScreen extends Screen {
             };
         };
     }
-
-    public static List<FormattedCharSequence> tooltipAt(OptionsList optionsList, int i, int j) {
-        if (!optionsList.isMouseOver(i, j))
-            return ImmutableList.of();
-        Optional<AbstractWidget> optional = optionsList.getMouseOver((double) i, (double) j);
-        return (List<FormattedCharSequence>) (optional.isPresent() && optional.get() instanceof TooltipAccessor
-                ? ((TooltipAccessor) optional.get()).getTooltip()
-                : ImmutableList.of());
-    }
+    
+	public static List<FormattedCharSequence> tooltipAt(OptionsList optionsList, int i, int j) {
+		if(!optionsList.isMouseOver(i, j))return ImmutableList.of();
+		Optional<AbstractWidget> optional = optionsList.getMouseOver((double) i, (double) j);
+		return (List<FormattedCharSequence>) (optional.isPresent() && optional.get() instanceof TooltipAccessor
+				? ((TooltipAccessor) optional.get()).getTooltip()
+				: ImmutableList.of());
+	}
 
     public static double round(double value, int places) {
         if (places < 0)
@@ -218,23 +217,23 @@ public abstract class CustomConfigScreen extends Screen {
         long tmp = Math.round(value);
         return (double) tmp / factor;
     }
-
+    
     public class PlainTextButton extends Button {
-        private final Font font;
-        private final Component message;
-        private final Component underlinedMessage;
+    	private final Font font;
+    	private final Component message;
+    	private final Component underlinedMessage;
 
-        public PlainTextButton(int i, int j, int k, int l, Component component, OnPress onPress, Font font) {
-            super(i, j, k, l, component, onPress);
-            this.font = font;
-            this.message = component;
-            this.underlinedMessage = ComponentUtils.mergeStyles(component.copy(), Style.EMPTY.withUnderlined(true));
-        }
+    	public PlainTextButton(int i, int j, int k, int l, Component component, OnPress onPress, Font font) {
+    		super(i, j, k, l, component, onPress);
+    		this.font = font;
+    		this.message = component;
+    		this.underlinedMessage = ComponentUtils.mergeStyles(component.copy(), Style.EMPTY.withUnderlined(true));
+    	}
 
-        public void renderButton(PoseStack poseStack, int i, int j, float f) {
-            Component component = this.isHoveredOrFocused() ? this.underlinedMessage : this.message;
-            drawString(poseStack, this.font, component, this.x, this.y, 16777215 | Mth.ceil(this.alpha * 255.0F) << 24);
-        }
+    	public void renderButton(PoseStack poseStack, int i, int j, float f) {
+    		Component component = this.isHoveredOrFocused() ? this.underlinedMessage : this.message;
+    		drawString(poseStack, this.font, component, this.x, this.y, 16777215 | Mth.ceil(this.alpha * 255.0F) << 24);
+    	}
     }
 
 }

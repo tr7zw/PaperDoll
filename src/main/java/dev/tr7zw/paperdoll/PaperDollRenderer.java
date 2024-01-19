@@ -1,13 +1,11 @@
 package dev.tr7zw.paperdoll;
 
-import org.joml.Quaternionf;
-
 import com.mojang.blaze3d.platform.Lighting;
 import com.mojang.blaze3d.systems.RenderSystem;
 import com.mojang.blaze3d.vertex.PoseStack;
-import com.mojang.math.Axis;
 
 import dev.tr7zw.paperdoll.PaperDollSettings.DollHeadMode;
+import dev.tr7zw.util.NMSHelper;
 import net.minecraft.client.CameraType;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.MultiBufferSource;
@@ -17,6 +15,13 @@ import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.vehicle.Minecart;
 import net.minecraft.world.phys.Vec3;
+
+//spotless:off
+//#if MC >= 11903
+import org.joml.Quaternionf;
+//#else
+//$$ import com.mojang.math.Quaternion;
+//#endif
 
 public class PaperDollRenderer {
 
@@ -131,8 +136,15 @@ public class PaperDollRenderer {
         PoseStack matrixStack = new PoseStack();
         matrixStack.translate(0.0D, 0.0D, 1000.0D);
         matrixStack.scale((float) size, (float) size, (float) size);
-        Quaternionf quaternion = Axis.ZP.rotationDegrees(180.0F);
-        Quaternionf quaternion2 = Axis.XP.rotationDegrees(rotationUp * 20.0F);
+        // spotless:off
+    	//#if MC >= 11903
+        Quaternionf quaternion = NMSHelper.ZP.rotationDegrees(180.0F);
+        Quaternionf quaternion2 = NMSHelper.XP.rotationDegrees(rotationUp * 20.0F);
+        //#else
+        //$$Quaternion quaternion = NMSHelper.ZP.rotationDegrees(180.0F);
+        //$$Quaternion quaternion2 = NMSHelper.XP.rotationDegrees(rotationUp * 20.0F);
+        //#endif
+        // spotless:on
         quaternion.mul(quaternion2);
         matrixStack.mulPose(quaternion);
         float yBodyRot = livingEntity.yBodyRot;
@@ -180,7 +192,13 @@ public class PaperDollRenderer {
         }
         Lighting.setupForEntityInInventory();
         EntityRenderDispatcher entityRenderDispatcher = mc_instance.getEntityRenderDispatcher();
+        // spotless:off
+    	//#if MC >= 11903
         quaternion2.conjugate();
+        //#else
+        //$$ quaternion2.conj();
+        //#endif
+        // spotless:on
         entityRenderDispatcher.overrideCameraOrientation(quaternion2);
         entityRenderDispatcher.setRenderShadow(false);
         MultiBufferSource.BufferSource bufferSource = Minecraft.getInstance().renderBuffers().bufferSource();
@@ -240,8 +258,15 @@ public class PaperDollRenderer {
         PoseStack matrixStack = new PoseStack();
         matrixStack.translate(0.0D, 0.0D, 1000.0D);
         matrixStack.scale((float) size, (float) size, (float) size);
-        Quaternionf quaternion = Axis.ZP.rotationDegrees(180.0F);
-        Quaternionf quaternion2 = Axis.XP.rotationDegrees(rotationUp * 20.0F);
+        // spotless:off
+    	//#if MC >= 11903
+        Quaternionf quaternion = NMSHelper.ZP.rotationDegrees(180.0F);
+        Quaternionf quaternion2 = NMSHelper.XP.rotationDegrees(rotationUp * 20.0F);
+        //#else
+        //$$Quaternion quaternion = NMSHelper.ZP.rotationDegrees(180.0F);
+        //$$Quaternion quaternion2 = NMSHelper.XP.rotationDegrees(rotationUp * 20.0F);
+        //#endif
+        // spotless:on
         quaternion.mul(quaternion2);
         matrixStack.mulPose(quaternion);
         float yRot = entity.getYRot();
@@ -262,7 +287,13 @@ public class PaperDollRenderer {
         }
         Lighting.setupForEntityInInventory();
         EntityRenderDispatcher entityRenderDispatcher = mc_instance.getEntityRenderDispatcher();
+        // spotless:off
+        //#if MC >= 11903
         quaternion2.conjugate();
+        //#else
+        //$$ quaternion2.conj();
+        //#endif
+        // spotless:on
         entityRenderDispatcher.overrideCameraOrientation(quaternion2);
         entityRenderDispatcher.setRenderShadow(false);
         MultiBufferSource.BufferSource bufferSource = Minecraft.getInstance().renderBuffers().bufferSource();

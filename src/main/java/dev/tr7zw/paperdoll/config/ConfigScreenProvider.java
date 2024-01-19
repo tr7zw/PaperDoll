@@ -9,9 +9,19 @@ import dev.tr7zw.paperdoll.PaperDollSettings.DollHeadMode;
 import dev.tr7zw.paperdoll.PaperDollSettings.PaperDollLocation;
 import dev.tr7zw.paperdoll.PaperDollShared;
 import lombok.experimental.UtilityClass;
-import net.minecraft.client.OptionInstance;
-import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.screens.Screen;
+//spotless:off 
+//#if MC >= 11900
+import net.minecraft.client.OptionInstance;
+//#else
+//$$ import net.minecraft.client.Option;
+//#endif
+//#if MC >= 12000
+import net.minecraft.client.gui.GuiGraphics;
+//#else
+//$$ import com.mojang.blaze3d.vertex.PoseStack;
+//#endif
+//spotless:on
 
 @UtilityClass
 public class ConfigScreenProvider {
@@ -24,7 +34,7 @@ public class ConfigScreenProvider {
                 PaperDollShared inst = PaperDollShared.instance;
                 getOptions().addBig(getOnOffOption("text.paperdoll.enabled", () -> inst.settings.dollEnabled,
                         (b) -> inst.settings.dollEnabled = b));
-                List<OptionInstance<?>> options = new ArrayList<>();
+                List<Object> options = new ArrayList<>();
                 options.add(getEnumOption("text.paperdoll.location", PaperDollLocation.class,
                         () -> inst.settings.location, (loc) -> inst.settings.location = loc));
                 options.add(getEnumOption("text.paperdoll.headMode", DollHeadMode.class,
@@ -43,7 +53,14 @@ public class ConfigScreenProvider {
                         (b) -> inst.settings.autoHide = b));
                 options.add(getOnOffOption("text.paperdoll.hideInF5", () -> inst.settings.hideInF5,
                         (b) -> inst.settings.hideInF5 = b));
-                getOptions().addSmall(options.toArray(new OptionInstance[0]));
+
+                // spotless:off
+				//#if MC >= 11900
+				getOptions().addSmall(options.toArray(new OptionInstance[0]));
+				//#else
+				//$$getOptions().addSmall(options.toArray(new Option[0]));
+				//#endif
+				// spotless:on
 
             }
 
@@ -53,8 +70,15 @@ public class ConfigScreenProvider {
             }
 
             @Override
-            public void render(GuiGraphics guiGraphics, int i, int j, float f) {
-                super.render(guiGraphics, i, j, f);
+            // spotless:off
+			//#if MC >= 12000
+			public void render(GuiGraphics guiGraphics, int i, int j, float f) {
+				super.render(guiGraphics, i, j, f);
+				//#else
+				//$$ public void render(PoseStack poseStack, int i, int j, float f) {
+				//$$ super.render(poseStack, i, j, f);
+				//#endif
+				// spotless:on
                 PaperDollShared.instance.renderer.render(f);
             }
 

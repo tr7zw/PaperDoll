@@ -4,6 +4,7 @@
 build/
 out/
 classes/
+logs/
 
 # eclipse
 
@@ -42,3 +43,6 @@ PDFabric/logs/
 UtilityCode
 *.log
 formatter.xml
+src/main/fabric-resources/fabric.mod.json
+src/main/forge-resources/META-INF/mods.toml
+src/main/neoforge-resources/META-INF/mods.toml
