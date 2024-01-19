@@ -25,7 +25,13 @@ public class PaperDollRenderer {
     private long showTill = 0;
 
     public void render(float delta) {
+        // spotless:off
+    	//#if MC >= 12002
         if (!instance.settings.dollEnabled || mc_instance.getDebugOverlay().showDebugScreen()
+        //#else
+        //$$ if (!instance.settings.dollEnabled || mc_instance.options.renderDebug
+        //#endif
+        // spotless:on
                 || mc_instance.level == null) {
             return;
         }
