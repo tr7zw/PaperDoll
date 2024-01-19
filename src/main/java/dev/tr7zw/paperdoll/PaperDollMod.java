@@ -1,3 +1,4 @@
+//#if FABRIC
 package dev.tr7zw.paperdoll;
 
 import net.fabricmc.api.ClientModInitializer;
@@ -9,3 +10,4 @@ public class PaperDollMod extends PaperDollShared implements ClientModInitialize
         init();
     }
 }
+//#endif
