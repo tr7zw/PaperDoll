@@ -155,7 +155,8 @@ public abstract class CustomConfigScreen extends Screen {
                                 % targetEnum.getEnumConstants().length]),
                 (options, cycleOption) -> {
                     cycleOption.setTooltip(createStaticTooltip(translationKey));
-                    return new TranslatableComponent(translationKey).append(": ").append(new TranslatableComponent(translationKey + "." + current.get().name()));
+                    return new TranslatableComponent(translationKey).append(": ")
+                            .append(new TranslatableComponent(translationKey + "." + current.get().name()));
                 });
 
         return option;
@@ -172,7 +173,8 @@ public abstract class CustomConfigScreen extends Screen {
     }
 
     public static List<FormattedCharSequence> tooltipAt(OptionsList arg, int i, int j) {
-    	if(!arg.isMouseOver(i, j))return null;
+        if (!arg.isMouseOver(i, j))
+            return null;
         Optional<AbstractWidget> optional = arg.getMouseOver(i, j);
         if (optional.isPresent() && optional.get() instanceof TooltipAccessor) {
             Optional<List<FormattedCharSequence>> optional2 = ((TooltipAccessor) optional.get()).getTooltip();
@@ -180,7 +182,7 @@ public abstract class CustomConfigScreen extends Screen {
         }
         return null;
     }
-    
+
     public static double round(double value, int places) {
         if (places < 0)
             throw new IllegalArgumentException();
@@ -190,24 +192,23 @@ public abstract class CustomConfigScreen extends Screen {
         long tmp = Math.round(value);
         return (double) tmp / factor;
     }
-    
+
     public class PlainTextButton extends Button {
-    	private final Font font;
-    	private final Component message;
-    	private final Component underlinedMessage;
+        private final Font font;
+        private final Component message;
+        private final Component underlinedMessage;
 
-    	public PlainTextButton(int x, int y, int width, int height, Component message, OnPress onPress, Font font) {
-    		super(x, y, width, height, message, onPress);
-    		this.font = font;
-    		this.message = message;
-    		this.underlinedMessage = ComponentUtils.mergeStyles(message.copy(), Style.EMPTY.withUnderlined(true));
-    	}
+        public PlainTextButton(int x, int y, int width, int height, Component message, OnPress onPress, Font font) {
+            super(x, y, width, height, message, onPress);
+            this.font = font;
+            this.message = message;
+            this.underlinedMessage = ComponentUtils.mergeStyles(message.copy(), Style.EMPTY.withUnderlined(true));
+        }
 
-    	public void renderButton(PoseStack poseStack, int mouseX, int mouseY, float partialTick) {
-    		Component component = this.isHovered() ? this.underlinedMessage : this.message;
-    		drawString(poseStack, this.font, component, this.x, this.y,
-    				16777215 | Mth.ceil(this.alpha * 255.0F) << 24);
-    	}
+        public void renderButton(PoseStack poseStack, int mouseX, int mouseY, float partialTick) {
+            Component component = this.isHovered() ? this.underlinedMessage : this.message;
+            drawString(poseStack, this.font, component, this.x, this.y, 16777215 | Mth.ceil(this.alpha * 255.0F) << 24);
+        }
     }
 
 }
