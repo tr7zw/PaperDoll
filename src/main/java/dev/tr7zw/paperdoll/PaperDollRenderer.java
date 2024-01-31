@@ -19,6 +19,7 @@ import net.minecraft.client.CameraType;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.MultiBufferSource;
 import net.minecraft.client.renderer.entity.EntityRenderDispatcher;
+import net.minecraft.util.Mth;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.vehicle.Minecart;
@@ -138,7 +139,9 @@ public class PaperDollRenderer {
         PoseStack poseStack = getPoseStack();
         poseStack.pushPose();
         if (livingEntity.isFallFlying() || livingEntity.isAutoSpinAttack()) {
-            ypos -= (90f + livingEntity.xRotO) / 90f * (size) - 5;
+            float f2 = (float) livingEntity.getFallFlyingTicks() + delta;
+            float f3 = Mth.clamp(f2 * f2 / 100.0F, 0.0F, 1.0F);
+            ypos -= (90f + f3) / 90f * (size) - 5;
         }
         poseStack.translate(xpos, ypos, 1050.0D);
         poseStack.scale(1.0F, 1.0F, -1.0F);
