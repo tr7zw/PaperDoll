@@ -33,7 +33,7 @@ public class PaperDollRenderer {
 
     public void render(float delta) {
         // spotless:off
-    	//#if MC >= 12002
+        //#if MC >= 12002
         if (!instance.settings.dollEnabled || mc_instance.getDebugOverlay().showDebugScreen()
         //#else
         //$$ if (!instance.settings.dollEnabled || mc_instance.options.renderDebug
@@ -84,7 +84,7 @@ public class PaperDollRenderer {
                 hide = false;
             }
             // spotless:off
-        	//#if MC >= 11700
+                //#if MC >= 11700
             if(livingEntity.isInPowderSnow)hide = false;
             //#endif
             // spotless:on
@@ -136,21 +136,17 @@ public class PaperDollRenderer {
             LivingEntity livingEntity, float delta, boolean lockHead) {
         float rotationSide = (float) Math.atan((double) (lookSides / 40.0F));
         float rotationUp = (float) Math.atan((double) (lookUpDown / 40.0F));
-        PoseStack poseStack = getPoseStack();
-        poseStack.pushPose();
         if (livingEntity.isFallFlying() || livingEntity.isAutoSpinAttack()) {
             float f2 = (float) livingEntity.getFallFlyingTicks() + delta;
             float f3 = Mth.clamp(f2 * f2 / 100.0F, 0.0F, 1.0F);
             ypos -= (90f + f3) / 90f * (size) - 5;
         }
-        poseStack.translate(xpos, ypos, 1050.0D);
-        poseStack.scale(1.0F, 1.0F, -1.0F);
         prepareViewMatrix(xpos, ypos);
         PoseStack matrixStack = new PoseStack();
         matrixStack.translate(0.0D, 0.0D, 1000.0D);
         matrixStack.scale((float) size, (float) size, (float) size);
         // spotless:off
-    	//#if MC >= 11903
+        //#if MC >= 11903
         Quaternionf quaternion = NMSHelper.ZP.rotationDegrees(180.0F);
         Quaternionf quaternion2 = NMSHelper.XP.rotationDegrees(rotationUp * 20.0F);
         //#else
@@ -245,7 +241,6 @@ public class PaperDollRenderer {
             livingVehicle.yBodyRot = vehicleYBodyRot;
             livingVehicle.yBodyRotO = vehicleYBodyRotO;
         }
-        poseStack.popPose();
         resetViewMatrix();
         // #else
         // $$ Lighting.setupFor3DItems();
@@ -256,8 +251,17 @@ public class PaperDollRenderer {
 
     private void prepareViewMatrix(double xpos, double ypos) {
         // spotless:off
-    	//#if MC >= 11700
+        //#if MC >= 12005
+        RenderSystem.getModelViewStack().pushMatrix();
+        RenderSystem.getModelViewStack().translate((float)xpos, (float)ypos, 1050.0F);
+        RenderSystem.getModelViewStack().scale(1.0F, 1.0F, -1.0F);
         RenderSystem.applyModelViewMatrix();
+        //#elseif MC >= 11700
+        //$$ PoseStack poseStack = RenderSystem.getModelViewStack();
+        //$$ poseStack.pushPose();
+        //$$ poseStack.translate(xpos, ypos, 1050.0D);
+        //$$ poseStack.scale(1.0F, 1.0F, -1.0F);
+        //$$ RenderSystem.applyModelViewMatrix();
         //#else
         //$$ RenderSystem.pushMatrix();
         //$$ RenderSystem.translatef((float)xpos, (float)ypos, 1050.0F);
@@ -268,8 +272,12 @@ public class PaperDollRenderer {
 
     private void resetViewMatrix() {
         // spotless:off
-    	//#if MC >= 11700
+        //#if MC >= 12005
+        RenderSystem.getModelViewStack().popMatrix();
         RenderSystem.applyModelViewMatrix();
+        //#elseif MC >= 11700
+        //$$ RenderSystem.getModelViewStack().popPose();
+        //$$ RenderSystem.applyModelViewMatrix();
         //#else
         //$$ RenderSystem.popMatrix();
         //#endif
@@ -278,7 +286,7 @@ public class PaperDollRenderer {
 
     private void prepareLighting() {
         // spotless:off
-    	//#if MC >= 11700
+        //#if MC >= 11700
         Lighting.setupForEntityInInventory();
         //#else
         //$$ Lighting.setupForFlatItems();
@@ -287,7 +295,7 @@ public class PaperDollRenderer {
     }
 
     // spotless:off
-    	//#if MC >= 11903
+        //#if MC >= 11903
         private void conjugate(Quaternionf quaternion2) {
         quaternion2.conjugate();
         //#else
@@ -297,34 +305,19 @@ public class PaperDollRenderer {
         // spotless:on
     }
 
-    private PoseStack getPoseStack() {
-        // spotless:off
-    	//#if MC >= 11700
-        PoseStack poseStack = RenderSystem.getModelViewStack();
-        //#else
-        //$$ PoseStack poseStack = new PoseStack();
-        //#endif
-        // spotless:on
-        return poseStack;
-    }
-
     private void drawEntity(double xpos, double ypos, int size, float lookSides, float lookUpDown, Entity entity,
             float delta, boolean lockHead) {
         float rotationSide = (float) Math.atan((double) (lookSides / 40.0F));
         float rotationUp = (float) Math.atan((double) (lookUpDown / 40.0F));
-        PoseStack poseStack = getPoseStack();
-        poseStack.pushPose();
         if (mc_instance.player.isFallFlying() || mc_instance.player.isAutoSpinAttack()) {
             ypos -= (90f + entity.xRotO) / 90f * (size) - 5;
         }
-        poseStack.translate(xpos, ypos, 1050.0D);
-        poseStack.scale(1.0F, 1.0F, -1.0F);
         prepareViewMatrix(xpos, ypos);
         PoseStack matrixStack = new PoseStack();
         matrixStack.translate(0.0D, 0.0D, 1000.0D);
         matrixStack.scale((float) size, (float) size, (float) size);
         // spotless:off
-    	//#if MC >= 11903
+        //#if MC >= 11903
         Quaternionf quaternion = NMSHelper.ZP.rotationDegrees(180.0F);
         Quaternionf quaternion2 = NMSHelper.XP.rotationDegrees(rotationUp * 20.0F);
         //#else
@@ -345,7 +338,7 @@ public class PaperDollRenderer {
         entity.yRotO = NMSHelper.getYRot(entity);
         entity.setDeltaMovement(Vec3.ZERO);
         // spotless:off
-    	//#if MC >= 11700
+        //#if MC >= 11700
         entity.setPos(pos.add(0, 500, 0)); // hack to disconnect minecarts from rails for the rendering
         //#endif
         // spotless:on
@@ -376,12 +369,11 @@ public class PaperDollRenderer {
         entity.xRotO = xRotO;
         entity.setDeltaMovement(vel);
         // spotless:off
-    	//#if MC >= 11700
+        //#if MC >= 11700
         entity.setPos(pos);
         //#endif
         // spotless:on
         entity.yOld = yOld;
-        poseStack.popPose();
         resetViewMatrix();
         Lighting.setupFor3DItems();
     }
