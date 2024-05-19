@@ -146,6 +146,11 @@ public class PaperDollRenderer {
         matrixStack.translate(0.0D, 0.0D, 1000.0D);
         matrixStack.scale((float) size, (float) size, (float) size);
         // spotless:off
+        //#if MC >= 12005
+        int rot = 0;
+        //#else
+        //$$ int rot = 180;
+        //#endif
         //#if MC >= 11903
         Quaternionf quaternion = NMSHelper.ZP.rotationDegrees(180.0F);
         Quaternionf quaternion2 = NMSHelper.XP.rotationDegrees(rotationUp * 20.0F);
@@ -167,8 +172,8 @@ public class PaperDollRenderer {
         Vec3 deltaMovement = livingEntity.getDeltaMovement();
         float vehicleYBodyRot = 0;
         float vehicleYBodyRotO = 0;
-        livingEntity.yBodyRot = 180.0F + rotationSide * 20.0F;
-        NMSHelper.setYRot(livingEntity, 180.0F + rotationSide * 40.0F);
+        livingEntity.yBodyRot = rot + rotationSide * 20.0F;
+        NMSHelper.setYRot(livingEntity, rot + rotationSide * 40.0F);
         livingEntity.yBodyRotO = livingEntity.yBodyRot;
         livingEntity.yRotO = NMSHelper.getYRot(livingEntity);
         Vec3 lastDeltaMovement = null;
@@ -192,11 +197,11 @@ public class PaperDollRenderer {
             livingEntity.yHeadRotO = NMSHelper.getYRot(livingEntity);
         } else {
             if (instance.settings.dollHeadMode == DollHeadMode.FREE) {
-                livingEntity.yHeadRot = 180.0F + rotationSide * 40.0F - (yBodyRot - yHeadRot);
-                livingEntity.yHeadRotO = 180.0F + rotationSide * 40.0F - (yBodyRotO - yHeadRotO);
+                livingEntity.yHeadRot = rot + rotationSide * 40.0F - (yBodyRot - yHeadRot);
+                livingEntity.yHeadRotO = rot + rotationSide * 40.0F - (yBodyRotO - yHeadRotO);
             } else {
-                livingEntity.yHeadRot = 180.0F + rotationSide * 40.0F - (yRot - yHeadRot);
-                livingEntity.yHeadRotO = 180.0F + rotationSide * 40.0F - (yRotO - yHeadRotO);
+                livingEntity.yHeadRot = rot + rotationSide * 40.0F - (yRot - yHeadRot);
+                livingEntity.yHeadRotO = rot + rotationSide * 40.0F - (yRotO - yHeadRotO);
             }
         }
         prepareLighting();
@@ -212,7 +217,7 @@ public class PaperDollRenderer {
             Entity vehicle = livingEntity.getVehicle();
             double offsetXTmp = livingEntity.getX() - vehicle.getX();
             double offsetZTmp = livingEntity.getZ() - vehicle.getZ();
-            float rotation = NMSHelper.getYRot(vehicle) - 180 - rotationSide * 20.0F; // target is 180
+            float rotation = NMSHelper.getYRot(vehicle) - rot - rotationSide * 20.0F; // target is 180
             rotation *= NMSHelper.DEG_TO_RAD;
             rotation *= -1;
             offsetX += Math.cos(rotation) * offsetXTmp - Math.sin(rotation) * offsetZTmp;
@@ -254,7 +259,7 @@ public class PaperDollRenderer {
         //#if MC >= 12005
         RenderSystem.getModelViewStack().pushMatrix();
         RenderSystem.getModelViewStack().translate((float)xpos, (float)ypos, 1050.0F);
-        RenderSystem.getModelViewStack().scale(1.0F, 1.0F, -1.0F);
+        //RenderSystem.getModelViewStack().scale(1.0F, 1.0F, -1.0F);
         RenderSystem.applyModelViewMatrix();
         //#elseif MC >= 11700
         //$$ PoseStack poseStack = RenderSystem.getModelViewStack();
@@ -317,6 +322,11 @@ public class PaperDollRenderer {
         matrixStack.translate(0.0D, 0.0D, 1000.0D);
         matrixStack.scale((float) size, (float) size, (float) size);
         // spotless:off
+        //#if MC >= 12005
+        int rot = 0;
+        //#else
+        //$$ int rot = 180;
+        //#endif
         //#if MC >= 11903
         Quaternionf quaternion = NMSHelper.ZP.rotationDegrees(180.0F);
         Quaternionf quaternion2 = NMSHelper.XP.rotationDegrees(rotationUp * 20.0F);
@@ -359,7 +369,7 @@ public class PaperDollRenderer {
         if (entity instanceof Minecart) {
             extraRotation += 90;
         }
-        entityRenderDispatcher.render(entity, 0.0D, 0.0D, 0.0D, 180.0F + rotationSide * 20.0F + extraRotation, delta,
+        entityRenderDispatcher.render(entity, 0.0D, 0.0D, 0.0D, rot + rotationSide * 20.0F + extraRotation, delta,
                 matrixStack, bufferSource, 15728880);
         bufferSource.endBatch();
         entityRenderDispatcher.setRenderShadow(true);
