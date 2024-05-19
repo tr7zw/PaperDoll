@@ -84,7 +84,7 @@ public class PaperDollRenderer {
                 hide = false;
             }
             // spotless:off
-                //#if MC >= 11700
+            //#if MC >= 11700
             if(livingEntity.isInPowderSnow)hide = false;
             //#endif
             // spotless:on
