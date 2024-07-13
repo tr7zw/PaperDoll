@@ -19,17 +19,17 @@
 //$$package dev.tr7zw.paperdoll;
 //$$
 //$$import net.neoforged.api.distmarker.Dist;
-//$$import net.neoforged.fml.DistExecutor;
+//$$import net.neoforged.fml.loading.FMLEnvironment;
 //$$import net.neoforged.fml.common.Mod;
 //$$
 //$$@Mod("paperdoll")
 //$$public class PaperDollBootstrap {
 //$$
-//$$	public PaperDollBootstrap() {
-//$$		DistExecutor.unsafeRunWhenOn(Dist.CLIENT, () -> () -> { 
-//$$         new PaperDollShared().init();
-//$$        });
-//$$	}
-//$$	
+//$$    public PaperDollBootstrap() {
+//$$            if(FMLEnvironment.dist == Dist.CLIENT) {
+//$$                new PaperDollShared().init();
+//$$            }
+//$$    }
+//$$    
 //$$}
 //#endif
