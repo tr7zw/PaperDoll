@@ -259,7 +259,7 @@ public class PaperDollRenderer {
         //#if MC >= 12005
         RenderSystem.getModelViewStack().pushMatrix();
         RenderSystem.getModelViewStack().translate((float)xpos, (float)ypos, 1050.0F);
-        //RenderSystem.getModelViewStack().scale(1.0F, 1.0F, -1.0F);
+        RenderSystem.getModelViewStack().scale(-1.0F, 1.0F, 1.0F);
         RenderSystem.applyModelViewMatrix();
         //#elseif MC >= 11700
         //$$ PoseStack poseStack = RenderSystem.getModelViewStack();
