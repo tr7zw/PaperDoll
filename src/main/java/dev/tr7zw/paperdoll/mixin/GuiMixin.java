@@ -34,11 +34,11 @@ public class GuiMixin {
     
     @Inject(method = "<init>", at = @At("RETURN"))
     public void init(Minecraft minecraft, CallbackInfo ci) {
-        float delta = minecraft.getTimer().getGameTimeDeltaTicks();
         layers.add(new Layer() {
             
             @Override
             public void render(GuiGraphics guiGraphics, DeltaTracker deltaTracker) {
+                float delta = deltaTracker.getGameTimeDeltaPartialTick(true);
     //#elseif MC >= 12000
     //$$ @Inject(at = @At("HEAD"), method = "render")
     //$$ public void render(GuiGraphics guiGraphics, float delta, CallbackInfo info) {
