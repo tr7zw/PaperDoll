@@ -3,7 +3,7 @@ source: "https://github.com/tr7zw/ProcessedModTemplate/tree/master"
 replacements:
   name: "Paperdoll"
   id: "paperdoll"
-  version: "1.2.2"
+  version: "1.2.3"
   description: "Shows a small preview of the player in a corner of the screen."
   homepageUrl: "https://modrinth.com/mod/paperdoll"
   sourcesUrl: "https://github.com/tr7zw/PaperDoll"
