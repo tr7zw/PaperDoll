@@ -100,6 +100,10 @@ public class PaperDollRenderer {
             return;
         }
 
+        //#if MC >= 12102
+        Minecraft.getInstance().renderBuffers().bufferSource().endBatch();
+        //#endif
+
         if (playerEntity.isPassenger()) {
             Entity vehicle = playerEntity.getRootVehicle();
             getPassengersAndSelf(vehicle).forEachOrdered(entity -> {
@@ -226,8 +230,13 @@ public class PaperDollRenderer {
         }
         // Mc renders the player in the inventory without delta, causing it to look
         // "laggy". Good luck unseeing this :)
-        entityRenderDispatcher.render(livingEntity, offsetX, offsetY, offsetZ, 0.0F, delta, matrixStack, bufferSource,
+        //#if MC >= 12102
+        entityRenderDispatcher.render(livingEntity, offsetX, offsetY, offsetZ, 0.0F, matrixStack, bufferSource,
                 15728880);
+        //#else
+        //$$entityRenderDispatcher.render(livingEntity, offsetX, offsetY, offsetZ, 0.0F, matrixStack, bufferSource,
+        //$$        15728880);
+        //#endif
         bufferSource.endBatch();
         entityRenderDispatcher.setRenderShadow(true);
         if (livingEntity instanceof PlayerAccess player) {
@@ -260,7 +269,9 @@ public class PaperDollRenderer {
         RenderSystem.getModelViewStack().pushMatrix();
         RenderSystem.getModelViewStack().translate((float)xpos, (float)ypos, 1050.0F);
         RenderSystem.getModelViewStack().scale(-1.0F, 1.0F, 1.0F);
-        RenderSystem.applyModelViewMatrix();
+        //#if MC < 12102
+        //$$RenderSystem.applyModelViewMatrix();
+        //#endif
         //#elseif MC >= 11700
         //$$ PoseStack poseStack = RenderSystem.getModelViewStack();
         //$$ poseStack.pushPose();
@@ -279,7 +290,9 @@ public class PaperDollRenderer {
         // spotless:off
         //#if MC >= 12005
         RenderSystem.getModelViewStack().popMatrix();
-        RenderSystem.applyModelViewMatrix();
+        //#if MC < 12102
+        //$$RenderSystem.applyModelViewMatrix();
+        //#endif
         //#elseif MC >= 11700
         //$$ RenderSystem.getModelViewStack().popPose();
         //$$ RenderSystem.applyModelViewMatrix();
@@ -369,8 +382,13 @@ public class PaperDollRenderer {
         if (entity instanceof Minecart) {
             extraRotation += 90;
         }
-        entityRenderDispatcher.render(entity, 0.0D, 0.0D, 0.0D, rot + rotationSide * 20.0F + extraRotation, delta,
+        //#if MC >= 12102
+        entityRenderDispatcher.render(entity, 0.0D, 0.0D, 0.0D, rot + rotationSide * 20.0F + extraRotation,
                 matrixStack, bufferSource, 15728880);
+        //#else
+        //$$entityRenderDispatcher.render(entity, 0.0D, 0.0D, 0.0D, rot + rotationSide * 20.0F + extraRotation, delta,
+        //$$        matrixStack, bufferSource, 15728880);
+        //#endif
         bufferSource.endBatch();
         entityRenderDispatcher.setRenderShadow(true);
         NMSHelper.setYRot(entity, yRot);
