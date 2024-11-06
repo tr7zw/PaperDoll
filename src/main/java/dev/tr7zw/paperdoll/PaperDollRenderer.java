@@ -39,7 +39,7 @@ public class PaperDollRenderer {
         //$$ if (!instance.settings.dollEnabled || mc_instance.options.renderDebug
         //#endif
         // spotless:on
-                || mc_instance.level == null) {
+                || mc_instance.level == null || mc_instance.options.hideGui) {
             return;
         }
 
