@@ -234,7 +234,7 @@ public class PaperDollRenderer {
         entityRenderDispatcher.render(livingEntity, offsetX, offsetY, offsetZ, 0.0F, matrixStack, bufferSource,
                 15728880);
         //#else
-        //$$entityRenderDispatcher.render(livingEntity, offsetX, offsetY, offsetZ, 0.0F, matrixStack, bufferSource,
+        //$$entityRenderDispatcher.render(livingEntity, offsetX, offsetY, offsetZ, 0.0F, delta, matrixStack, bufferSource,
         //$$        15728880);
         //#endif
         bufferSource.endBatch();
@@ -383,8 +383,8 @@ public class PaperDollRenderer {
             extraRotation += 90;
         }
         //#if MC >= 12102
-        entityRenderDispatcher.render(entity, 0.0D, 0.0D, 0.0D, rot + rotationSide * 20.0F + extraRotation,
-                matrixStack, bufferSource, 15728880);
+        entityRenderDispatcher.render(entity, 0.0D, 0.0D, 0.0D, rot + rotationSide * 20.0F + extraRotation, matrixStack,
+                bufferSource, 15728880);
         //#else
         //$$entityRenderDispatcher.render(entity, 0.0D, 0.0D, 0.0D, rot + rotationSide * 20.0F + extraRotation, delta,
         //$$        matrixStack, bufferSource, 15728880);
