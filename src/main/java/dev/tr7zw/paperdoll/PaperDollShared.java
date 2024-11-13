@@ -48,7 +48,7 @@ public class PaperDollShared {
         }
         // spotless:off
         //#if FORGE || NEOFORGE
-        //#if MC <= 12004
+        //#if MC <= 12004 || NEOFORGE
         //$$ ModLoaderUtil.registerForgeEvent(new PaperDollEvents()::onOverlay);
         //#endif
         //#endif

@@ -18,6 +18,19 @@
 //$$
 //$$public class PaperDollEvents {
 //$$
+//#if NEOFORGE
+//#if MC >= 12100
+//$$    @SubscribeEvent
+//$$    public void onOverlay(RenderGuiEvent.Post e) {
+//$$            PaperDollShared.instance.renderer.render(e.getPartialTick().getGameTimeDeltaPartialTick(false));
+//$$    }
+//#else
+//$$    @SubscribeEvent
+//$$    public void onOverlay(RenderGuiEvent.Post e) {
+//$$            PaperDollShared.instance.renderer.render(e.getPartialTick());
+//$$    }
+//#endif
+//#else
 //#if MC >= 12005
 //#elseif MC >= 11900
 //$$    @SubscribeEvent
@@ -30,6 +43,7 @@
 //$$        if(e.getType() != ElementType.ALL)return;
 //$$        PaperDollShared.instance.renderer.render(e.getPartialTicks());
 //$$    }
+//#endif
 //#endif
 //$$	
 //$$}
