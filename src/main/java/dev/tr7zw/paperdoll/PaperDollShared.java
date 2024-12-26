@@ -13,11 +13,9 @@ import com.google.gson.GsonBuilder;
 
 import dev.tr7zw.paperdoll.config.ConfigScreenProvider;
 import dev.tr7zw.util.ModLoaderUtil;
-//spotless:off
 //#if FORGE || NEOFORGE
 //$$ import dev.tr7zw.paperdoll.forge.PaperDollEvents;
 //#endif
-//spotless:on
 
 public class PaperDollShared {
 
@@ -46,13 +44,11 @@ public class PaperDollShared {
             settings = new PaperDollSettings();
             writeSettings();
         }
-        // spotless:off
         //#if FORGE || NEOFORGE
         //#if MC <= 12004 || NEOFORGE
         //$$ ModLoaderUtil.registerForgeEvent(new PaperDollEvents()::onOverlay);
         //#endif
         //#endif
-        //spotless:on
     }
 
     public void writeSettings() {

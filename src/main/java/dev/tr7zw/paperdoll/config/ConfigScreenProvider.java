@@ -10,7 +10,6 @@ import dev.tr7zw.paperdoll.PaperDollSettings.PaperDollLocation;
 import dev.tr7zw.paperdoll.PaperDollShared;
 import lombok.experimental.UtilityClass;
 import net.minecraft.client.gui.screens.Screen;
-//spotless:off 
 //#if MC >= 11900
 import net.minecraft.client.OptionInstance;
 //#else
@@ -21,7 +20,6 @@ import net.minecraft.client.gui.GuiGraphics;
 //#else
 //$$ import com.mojang.blaze3d.vertex.PoseStack;
 //#endif
-//spotless:on
 
 @UtilityClass
 public class ConfigScreenProvider {
@@ -54,13 +52,12 @@ public class ConfigScreenProvider {
                 options.add(getOnOffOption("text.paperdoll.hideInF5", () -> inst.settings.hideInF5,
                         (b) -> inst.settings.hideInF5 = b));
 
-                // spotless:off
-				//#if MC >= 11900
-				getOptions().addSmall(options.toArray(new OptionInstance[0]));
-				//#else
-				//$$getOptions().addSmall(options.toArray(new Option[0]));
-				//#endif
-				// spotless:on
+                //#if MC >= 11900
+                getOptions().addSmall(options.toArray(new OptionInstance[0]));
+                //#else
+                //$$getOptions().addSmall(options.toArray(new Option[0]));
+                //#endif
+                // spotless:on
 
             }
 
@@ -70,15 +67,14 @@ public class ConfigScreenProvider {
             }
 
             @Override
-            // spotless:off
-			//#if MC >= 12000
-			public void render(GuiGraphics guiGraphics, int i, int j, float f) {
-				super.render(guiGraphics, i, j, f);
-				//#else
-				//$$ public void render(PoseStack poseStack, int i, int j, float f) {
-				//$$ super.render(poseStack, i, j, f);
-				//#endif
-				// spotless:on
+            //#if MC >= 12000
+            public void render(GuiGraphics guiGraphics, int i, int j, float f) {
+                super.render(guiGraphics, i, j, f);
+                //#else
+                //$$ public void render(PoseStack poseStack, int i, int j, float f) {
+                //$$ super.render(poseStack, i, j, f);
+                //#endif
+                // spotless:on
                 PaperDollShared.instance.renderer.render(f);
             }
 

@@ -2,7 +2,6 @@ package dev.tr7zw.paperdoll;
 
 import java.util.stream.Stream;
 
-//spotless:off
 //#if MC >= 11903
 import org.joml.Quaternionf;
 //#else
@@ -32,13 +31,11 @@ public class PaperDollRenderer {
     private long showTill = 0;
 
     public void render(float delta) {
-        // spotless:off
         //#if MC >= 12002
         if (!instance.settings.dollEnabled || mc_instance.getDebugOverlay().showDebugScreen()
         //#else
         //$$ if (!instance.settings.dollEnabled || mc_instance.options.renderDebug
         //#endif
-        // spotless:on
                 || mc_instance.level == null || mc_instance.options.hideGui) {
             return;
         }
@@ -83,11 +80,10 @@ public class PaperDollRenderer {
                     || livingEntity.isOnFire() || livingEntity.hurtTime > 0) {
                 hide = false;
             }
-            // spotless:off
             //#if MC >= 11700
-            if(livingEntity.isInPowderSnow)hide = false;
+            if (livingEntity.isInPowderSnow)
+                hide = false;
             //#endif
-            // spotless:on
 
             if (hide && System.currentTimeMillis() > showTill) {
                 return;
@@ -149,7 +145,6 @@ public class PaperDollRenderer {
         PoseStack matrixStack = new PoseStack();
         matrixStack.translate(0.0D, 0.0D, 1000.0D);
         matrixStack.scale((float) size, (float) size, (float) size);
-        // spotless:off
         //#if MC >= 12005
         int rot = 0;
         //#else
@@ -162,7 +157,6 @@ public class PaperDollRenderer {
         //$$Quaternion quaternion = NMSHelper.ZP.rotationDegrees(180.0F);
         //$$Quaternion quaternion2 = NMSHelper.XP.rotationDegrees(rotationUp * 20.0F);
         //#endif
-        // spotless:on
         quaternion.mul(quaternion2);
         matrixStack.mulPose(quaternion);
         float yBodyRot = livingEntity.yBodyRot;
@@ -259,15 +253,13 @@ public class PaperDollRenderer {
         // #else
         // $$ Lighting.setupFor3DItems();
         // #endif
-        // spotless:on
         Lighting.setupFor3DItems();
     }
 
     private void prepareViewMatrix(double xpos, double ypos) {
-        // spotless:off
         //#if MC >= 12005
         RenderSystem.getModelViewStack().pushMatrix();
-        RenderSystem.getModelViewStack().translate((float)xpos, (float)ypos, 1050.0F);
+        RenderSystem.getModelViewStack().translate((float) xpos, (float) ypos, 1050.0F);
         RenderSystem.getModelViewStack().scale(-1.0F, 1.0F, 1.0F);
         //#if MC < 12102
         //$$RenderSystem.applyModelViewMatrix();
@@ -283,11 +275,9 @@ public class PaperDollRenderer {
         //$$ RenderSystem.translatef((float)xpos, (float)ypos, 1050.0F);
         //$$ RenderSystem.scalef(1.0F, 1.0F, -1.0F);
         //#endif
-        // spotless:on
     }
 
     private void resetViewMatrix() {
-        // spotless:off
         //#if MC >= 12005
         RenderSystem.getModelViewStack().popMatrix();
         //#if MC < 12102
@@ -299,28 +289,23 @@ public class PaperDollRenderer {
         //#else
         //$$ RenderSystem.popMatrix();
         //#endif
-        // spotless:on
     }
 
     private void prepareLighting() {
-        // spotless:off
         //#if MC >= 11700
         Lighting.setupForEntityInInventory();
         //#else
         //$$ Lighting.setupForFlatItems();
         //#endif
-        // spotless:on
     }
 
-    // spotless:off
-        //#if MC >= 11903
-        private void conjugate(Quaternionf quaternion2) {
+    //#if MC >= 11903
+    private void conjugate(Quaternionf quaternion2) {
         quaternion2.conjugate();
         //#else
         //$$     private void conjugate(Quaternion quaternion2) {
         //$$ quaternion2.conj();
         //#endif
-        // spotless:on
     }
 
     private void drawEntity(double xpos, double ypos, int size, float lookSides, float lookUpDown, Entity entity,
@@ -334,7 +319,6 @@ public class PaperDollRenderer {
         PoseStack matrixStack = new PoseStack();
         matrixStack.translate(0.0D, 0.0D, 1000.0D);
         matrixStack.scale((float) size, (float) size, (float) size);
-        // spotless:off
         //#if MC >= 12005
         int rot = 0;
         //#else
@@ -347,7 +331,6 @@ public class PaperDollRenderer {
         //$$Quaternion quaternion = NMSHelper.ZP.rotationDegrees(180.0F);
         //$$Quaternion quaternion2 = NMSHelper.XP.rotationDegrees(rotationUp * 20.0F);
         //#endif
-        // spotless:on
         quaternion.mul(quaternion2);
         matrixStack.mulPose(quaternion);
         float yRot = NMSHelper.getYRot(entity);
@@ -360,11 +343,9 @@ public class PaperDollRenderer {
         NMSHelper.setYRot(entity, 0);
         entity.yRotO = NMSHelper.getYRot(entity);
         entity.setDeltaMovement(Vec3.ZERO);
-        // spotless:off
         //#if MC >= 11700
         entity.setPos(pos.add(0, 500, 0)); // hack to disconnect minecarts from rails for the rendering
         //#endif
-        // spotless:on
         entity.yOld += 500;
         if (lockHead) {
             NMSHelper.setXRot(entity, -rotationUp * 20.0F);
@@ -396,11 +377,9 @@ public class PaperDollRenderer {
         NMSHelper.setXRot(entity, xRot);
         entity.xRotO = xRotO;
         entity.setDeltaMovement(vel);
-        // spotless:off
         //#if MC >= 11700
         entity.setPos(pos);
         //#endif
-        // spotless:on
         entity.yOld = yOld;
         resetViewMatrix();
         Lighting.setupFor3DItems();
