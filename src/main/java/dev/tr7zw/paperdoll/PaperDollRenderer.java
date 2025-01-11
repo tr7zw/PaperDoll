@@ -225,7 +225,7 @@ public class PaperDollRenderer {
         // Mc renders the player in the inventory without delta, causing it to look
         // "laggy". Good luck unseeing this :)
         //#if MC >= 12102
-        entityRenderDispatcher.render(livingEntity, offsetX, offsetY, offsetZ, 0.0F, matrixStack, bufferSource,
+        entityRenderDispatcher.render(livingEntity, offsetX, offsetY, offsetZ, delta, matrixStack, bufferSource,
                 15728880);
         //#else
         //$$entityRenderDispatcher.render(livingEntity, offsetX, offsetY, offsetZ, 0.0F, delta, matrixStack, bufferSource,
