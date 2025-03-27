@@ -2,6 +2,8 @@
     "text.paperdoll.title": "PaperDoll Settings",
     "text.paperdoll.enabled": "\"PaperDoll\" enabled",
     "text.paperdoll.enabled.tooltip": "Enables the PaperDoll mod",
+    "text.paperdoll.tab.general_options": "Settings",
+    "text.paperdoll.category.doll_settings": "Visuals",
     "text.paperdoll.xOffset": "Doll X Offset",
     "text.paperdoll.xOffset.tooltip": "Moves the doll left/right",
     "text.paperdoll.yOffset": "Doll Y Offset",
