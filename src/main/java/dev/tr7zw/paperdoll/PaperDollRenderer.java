@@ -86,7 +86,7 @@ public class PaperDollRenderer {
         Minecraft.getInstance().renderBuffers().bufferSource().endBatch();
         //#endif
 
-        if (playerEntity.isPassenger()) {
+        if (!instance.settings.hideVehicle && playerEntity.isPassenger()) {
             Entity vehicle = playerEntity.getRootVehicle();
             getPassengersAndSelf(vehicle).forEachOrdered(entity -> {
                 double yOffset = fYpos;

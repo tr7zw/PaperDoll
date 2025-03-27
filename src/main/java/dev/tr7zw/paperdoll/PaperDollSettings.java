@@ -16,6 +16,7 @@ public class PaperDollSettings {
     public boolean autoHide = false;
     public final Set<AutoHideException> autoHideBlacklist = new HashSet<>();
     public boolean hideInF5 = true;
+    public boolean hideVehicle = false;
 
     public enum DollHeadMode {
         FREE, STATIC, LOCKED
