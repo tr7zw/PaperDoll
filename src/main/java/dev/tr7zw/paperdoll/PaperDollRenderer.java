@@ -32,14 +32,19 @@ public class PaperDollRenderer {
     private long showTill = 0;
 
     public void render(float delta) {
-        //#if MC >= 12002
-        if (!instance.settings.dollEnabled || mc_instance.getDebugOverlay().showDebugScreen()
-        //#else
-        //$$ if (!instance.settings.dollEnabled || mc_instance.options.renderDebug
-        //#endif
-                || mc_instance.level == null || mc_instance.options.hideGui) {
+        if (!instance.settings.dollEnabled)
             return;
-        }
+        //#if MC >= 12002
+        if (mc_instance.getDebugOverlay().showDebugScreen())
+            return;
+        //#else
+        //$$ if (mc_instance.options.renderDebug)
+        //$$     return;
+        //#endif
+        if (mc_instance.level == null)
+            return;
+        if (mc_instance.options.hideGui)
+            return;
 
         int xpos = 0;
         int ypos = 0;
@@ -117,20 +122,31 @@ public class PaperDollRenderer {
         Set<PaperDollSettings.AutoHideException> blacklist = instance.settings.autoHideBlacklist;
 
         // Movement
-        if (livingEntity.isCrouching() && !blacklist.contains(PaperDollSettings.AutoHideException.CROUCHING)) return false;
-        if (livingEntity.isSprinting() && !blacklist.contains(PaperDollSettings.AutoHideException.RUNNING)) return false;
-        if (livingEntity.isFallFlying() && !blacklist.contains(PaperDollSettings.AutoHideException.FALL_FLYING)) return false;
-        if (livingEntity.isVisuallySwimming() && !blacklist.contains(PaperDollSettings.AutoHideException.SWIMMING)) return false;
-        if (livingEntity.isPassenger() && !blacklist.contains(PaperDollSettings.AutoHideException.IN_VEHICLE)) return false;
+        if (livingEntity.isCrouching() && !blacklist.contains(PaperDollSettings.AutoHideException.CROUCHING))
+            return false;
+        if (livingEntity.isSprinting() && !blacklist.contains(PaperDollSettings.AutoHideException.RUNNING))
+            return false;
+        if (livingEntity.isFallFlying() && !blacklist.contains(PaperDollSettings.AutoHideException.FALL_FLYING))
+            return false;
+        if (livingEntity.isVisuallySwimming() && !blacklist.contains(PaperDollSettings.AutoHideException.SWIMMING))
+            return false;
+        if (livingEntity.isPassenger() && !blacklist.contains(PaperDollSettings.AutoHideException.IN_VEHICLE))
+            return false;
 
         // Combat
-        if (livingEntity.isBlocking() && !blacklist.contains(PaperDollSettings.AutoHideException.BLOCKING)) return false;
-        if (livingEntity.isUsingItem() && !blacklist.contains(PaperDollSettings.AutoHideException.USING_ITEM)) return false;
-        if (livingEntity.swinging && !blacklist.contains(PaperDollSettings.AutoHideException.SWINGING)) return false;
-        if (livingEntity.hurtTime > 0 && !blacklist.contains(PaperDollSettings.AutoHideException.TAKING_DAMAGE)) return false;
-        if (livingEntity.isOnFire() && !blacklist.contains(PaperDollSettings.AutoHideException.ON_FIRE)) return false;
+        if (livingEntity.isBlocking() && !blacklist.contains(PaperDollSettings.AutoHideException.BLOCKING))
+            return false;
+        if (livingEntity.isUsingItem() && !blacklist.contains(PaperDollSettings.AutoHideException.USING_ITEM))
+            return false;
+        if (livingEntity.swinging && !blacklist.contains(PaperDollSettings.AutoHideException.SWINGING))
+            return false;
+        if (livingEntity.hurtTime > 0 && !blacklist.contains(PaperDollSettings.AutoHideException.TAKING_DAMAGE))
+            return false;
+        if (livingEntity.isOnFire() && !blacklist.contains(PaperDollSettings.AutoHideException.ON_FIRE))
+            return false;
         //#if MC >= 11700
-        if (livingEntity.isInPowderSnow && !blacklist.contains(PaperDollSettings.AutoHideException.IN_POWDER_SNOW)) return false;
+        if (livingEntity.isInPowderSnow && !blacklist.contains(PaperDollSettings.AutoHideException.IN_POWDER_SNOW))
+            return false;
         //#endif
 
         return true;

@@ -27,8 +27,7 @@ public class PaperDollSettings {
     }
 
     public enum AutoHideException {
-        CROUCHING, RUNNING, FALL_FLYING, SWIMMING, IN_VEHICLE,
-        BLOCKING, USING_ITEM, SWINGING, TAKING_DAMAGE, ON_FIRE,
+        CROUCHING, RUNNING, FALL_FLYING, SWIMMING, IN_VEHICLE, BLOCKING, USING_ITEM, SWINGING, TAKING_DAMAGE, ON_FIRE,
         //#if MC >= 11700
         IN_POWDER_SNOW
         //#endif

@@ -45,25 +45,26 @@ public class ConfigScreenProvider {
             generalOptions.add(getOnOffOption("text.paperdoll.enabled", () -> inst.settings.dollEnabled,
                     b -> inst.settings.dollEnabled = b));
             generalOptions.add(getSplitLine("text.paperdoll.category.doll_settings"));
-            generalOptions.add(getEnumOption("text.paperdoll.location", PaperDollLocation.class, () -> inst.settings.location,
-                    (loc) -> inst.settings.location = loc));
-            generalOptions.add(getEnumOption("text.paperdoll.headMode", DollHeadMode.class, () -> inst.settings.dollHeadMode,
-                    (mode) -> inst.settings.dollHeadMode = mode));
+            generalOptions.add(getEnumOption("text.paperdoll.location", PaperDollLocation.class,
+                    () -> inst.settings.location, (loc) -> inst.settings.location = loc));
+            generalOptions.add(getEnumOption("text.paperdoll.headMode", DollHeadMode.class,
+                    () -> inst.settings.dollHeadMode, (mode) -> inst.settings.dollHeadMode = mode));
             generalOptions.add(getIntOption("text.paperdoll.xOffset", -100, 100, () -> inst.settings.dollXOffset,
                     (i) -> inst.settings.dollXOffset = i));
             generalOptions.add(getIntOption("text.paperdoll.yOffset", -100, 100, () -> inst.settings.dollYOffset,
                     (i) -> inst.settings.dollYOffset = i));
             generalOptions.add(getIntOption("text.paperdoll.size", -12, 40, () -> inst.settings.dollSize,
                     (i) -> inst.settings.dollSize = i));
-            generalOptions.add(getIntOption("text.paperdoll.lookingSides", -80, 80, () -> inst.settings.dollLookingSides,
-                    (i) -> inst.settings.dollLookingSides = i));
-            generalOptions.add(getIntOption("text.paperdoll.lookingUpDown", -80, 80, () -> inst.settings.dollLookingUpDown,
-                    (i) -> inst.settings.dollLookingUpDown = i));
+            generalOptions.add(getIntOption("text.paperdoll.lookingSides", -80, 80,
+                    () -> inst.settings.dollLookingSides, (i) -> inst.settings.dollLookingSides = i));
+            generalOptions.add(getIntOption("text.paperdoll.lookingUpDown", -80, 80,
+                    () -> inst.settings.dollLookingUpDown, (i) -> inst.settings.dollLookingUpDown = i));
 
             var generalOptionList = createOptionList(generalOptions);
             generalOptionList.setGap(-1);
             generalOptionList.setSize(14 * 20, 9 * 20);
-            wTabPanel.add(generalOptionList, b -> b.title(ComponentProvider.translatable("text.paperdoll.tab.general_options")));
+            wTabPanel.add(generalOptionList,
+                    b -> b.title(ComponentProvider.translatable("text.paperdoll.tab.general_options")));
 
             List<OptionInstance> autoHideOptions = new ArrayList<>();
             autoHideOptions.add(getOnOffOption("text.paperdoll.autohide", () -> inst.settings.autoHide,
@@ -75,22 +76,22 @@ public class ConfigScreenProvider {
 
             autoHideOptions.add(getSplitLine("text.paperdoll.category.auto_hide_exceptions"));
             for (PaperDollSettings.AutoHideException condition : PaperDollSettings.AutoHideException.values()) {
-                autoHideOptions.add(
-                    getOnOffOption("text.paperdoll.auto_hide." + condition.name().toLowerCase(Locale.US),
-                        () -> !inst.settings.autoHideBlacklist.contains(condition),
-                        (b) -> {
-                            if (b) inst.settings.autoHideBlacklist.remove(condition);
-                            else inst.settings.autoHideBlacklist.add(condition);
-                        }
-                    )
-                );
+                autoHideOptions
+                        .add(getOnOffOption("text.paperdoll.auto_hide." + condition.name().toLowerCase(Locale.US),
+                                () -> !inst.settings.autoHideBlacklist.contains(condition), (b) -> {
+                                    if (b)
+                                        inst.settings.autoHideBlacklist.remove(condition);
+                                    else
+                                        inst.settings.autoHideBlacklist.add(condition);
+                                }));
             }
 
             var autoHideOptionList = createOptionList(autoHideOptions);
             autoHideOptionList.setGap(-1);
             autoHideOptionList.setSize(14 * 20, 9 * 20);
 
-            wTabPanel.add(autoHideOptionList, b -> b.title(ComponentProvider.translatable("text.paperdoll.tab.auto_hide_options")));
+            wTabPanel.add(autoHideOptionList,
+                    b -> b.title(ComponentProvider.translatable("text.paperdoll.tab.auto_hide_options")));
 
             root.add(wTabPanel, 0, 1);
 

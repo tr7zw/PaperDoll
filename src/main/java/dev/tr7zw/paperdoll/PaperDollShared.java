@@ -24,7 +24,8 @@ public class PaperDollShared {
     public static PaperDollShared instance;
     private final File settingsFile = new File("config", "paperdoll.json");
     private final Gson gson = new GsonBuilder().setPrettyPrinting().create();
-    private final KeyMapping toggleKeybind = new KeyMapping("key.paperdoll.toggle", -1, "text.paperdoll.keybinds.title");
+    private final KeyMapping toggleKeybind = new KeyMapping("key.paperdoll.toggle", -1,
+            "text.paperdoll.keybinds.title");
     private boolean toggleKeybindPressed = false;
     public PaperDollSettings settings = new PaperDollSettings();
     public PaperDollRenderer renderer;

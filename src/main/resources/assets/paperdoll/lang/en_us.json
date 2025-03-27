@@ -32,18 +32,18 @@
     "text.paperdoll.autohide.tooltip": "Hides the doll when the player is not doing any action",
     "text.paperdoll.hideInF5": "Hide In F5",
     "text.paperdoll.hideInF5.tooltip": "Hides the doll while in F5 mode",
-    "text.paperdoll.hideVehicle": "Hide vehicle",
+    "text.paperdoll.hideVehicle": "Hide vehicles",
     "text.paperdoll.hideVehicle.tooltip": "Prevent rendering vehicles",
     "text.paperdoll.category.auto_hide_exceptions": "Autohide exceptions",
     "text.paperdoll.auto_hide.crouching": "Crouching",
     "text.paperdoll.auto_hide.running": "Sprinting",
     "text.paperdoll.auto_hide.fall_flying": "Fall flying (elytra)",
     "text.paperdoll.auto_hide.swimming": "Swimming",
-    "text.paperdoll.auto_hide.in_vehicle": "Riding vehicle",
+    "text.paperdoll.auto_hide.in_vehicle": "Riding a vehicle",
     "text.paperdoll.auto_hide.blocking": "Blocking (e.g., with a shield)",
     "text.paperdoll.auto_hide.using_item": "Using an item",
-    "text.paperdoll.auto_hide.swinging": "Swinging hand",
+    "text.paperdoll.auto_hide.swinging": "Swinging a hand",
     "text.paperdoll.auto_hide.taking_damage": "Taking damage",
     "text.paperdoll.auto_hide.on_fire": "Being on fire",
-    "text.paperdoll.auto_hide.in_powder_snow": "Being in powder snow"
+    "text.paperdoll.auto_hide.in_powder_snow": "Being in a powder snow"
 }
