@@ -1,4 +1,6 @@
 {
+    "key.paperdoll.toggle": "Toggle Paper Doll",
+    "text.paperdoll.keybinds.title": "Paper Doll",
     "text.paperdoll.title": "PaperDoll Settings",
     "text.paperdoll.enabled": "\"PaperDoll\" enabled",
     "text.paperdoll.enabled.tooltip": "Enables the PaperDoll mod",

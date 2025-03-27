@@ -5,6 +5,7 @@ import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 
+import net.minecraft.client.KeyMapping;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
@@ -23,6 +24,8 @@ public class PaperDollShared {
     public static PaperDollShared instance;
     private final File settingsFile = new File("config", "paperdoll.json");
     private final Gson gson = new GsonBuilder().setPrettyPrinting().create();
+    private final KeyMapping toggleKeybind = new KeyMapping("key.paperdoll.toggle", -1, "text.paperdoll.keybinds.title");
+    private boolean toggleKeybindPressed = false;
     public PaperDollSettings settings = new PaperDollSettings();
     public PaperDollRenderer renderer;
 
@@ -32,6 +35,8 @@ public class PaperDollShared {
         renderer = new PaperDollRenderer();
         ModLoaderUtil.disableDisplayTest();
         ModLoaderUtil.registerConfigScreen(ConfigScreenProvider::createConfigScreen);
+        ModLoaderUtil.registerKeybind(toggleKeybind);
+        ModLoaderUtil.registerClientTickListener(this::onClientTick);
         if (settingsFile.exists()) {
             try {
                 settings = gson.fromJson(new String(Files.readAllBytes(settingsFile.toPath()), StandardCharsets.UTF_8),
@@ -58,6 +63,18 @@ public class PaperDollShared {
             Files.write(settingsFile.toPath(), gson.toJson(settings).getBytes(StandardCharsets.UTF_8));
         } catch (IOException e1) {
             LOGGER.warn("Error while saving config!", e1);
+        }
+    }
+
+    public void onClientTick() {
+        if (toggleKeybind.isDown()) {
+            if (toggleKeybindPressed)
+                return;
+
+            toggleKeybindPressed = true;
+            settings.dollEnabled = !settings.dollEnabled;
+        } else {
+            toggleKeybindPressed = false;
         }
     }
 
