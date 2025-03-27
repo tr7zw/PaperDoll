@@ -59,6 +59,11 @@ public class ConfigScreenProvider {
                     () -> inst.settings.dollLookingSides, (i) -> inst.settings.dollLookingSides = i));
             generalOptions.add(getIntOption("text.paperdoll.lookingUpDown", -80, 80,
                     () -> inst.settings.dollLookingUpDown, (i) -> inst.settings.dollLookingUpDown = i));
+            generalOptions.add(getSplitLine("text.paperdoll.category.behavior_settings"));
+            generalOptions.add(getOnOffOption("text.paperdoll.lock_elytra_rotation", () -> inst.settings.lockElytra,
+                    (b) -> inst.settings.lockElytra = b));
+            generalOptions.add(getOnOffOption("text.paperdoll.lock_spinning_rotation", () -> inst.settings.lockSpinning,
+                    (b) -> inst.settings.lockSpinning = b));
 
             var generalOptionList = createOptionList(generalOptions);
             generalOptionList.setGap(-1);

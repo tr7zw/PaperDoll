@@ -91,6 +91,9 @@ public class PaperDollRenderer {
         Minecraft.getInstance().renderBuffers().bufferSource().endBatch();
         //#endif
 
+        boolean lockYHeadRot = instance.settings.dollHeadMode == DollHeadMode.LOCKED;
+        boolean lockXHeadRot = lockYHeadRot || instance.settings.dollHeadMode == DollHeadMode.FREE_HORIZONTAL
+                || instance.settings.dollHeadMode == DollHeadMode.STATIC_HORIZONTAL;
         if (!instance.settings.hideVehicle && playerEntity.isPassenger()) {
             Entity vehicle = playerEntity.getRootVehicle();
             getPassengersAndSelf(vehicle).forEachOrdered(entity -> {
@@ -98,21 +101,18 @@ public class PaperDollRenderer {
                 if (entity != playerEntity)
                     yOffset += (playerEntity.getY() - entity.getY()) * size;
                 if (entity instanceof LivingEntity living) {
-                    drawLivingEntity(fXpos, yOffset, size, lookSides, lookUpDown, living, delta,
-                            instance.settings.dollHeadMode == DollHeadMode.LOCKED);
+                    drawLivingEntity(fXpos, yOffset, size, lookSides, lookUpDown, living, delta, lockXHeadRot,
+                            lockYHeadRot);
                 } else {
                     // yOffset -= 10;
-                    drawEntity(fXpos, yOffset, size, lookSides, lookUpDown, entity, delta,
-                            instance.settings.dollHeadMode == DollHeadMode.LOCKED);
+                    drawEntity(fXpos, yOffset, size, lookSides, lookUpDown, entity, delta, lockYHeadRot);
                 }
             });
         } else {
             if (playerEntity instanceof LivingEntity living) {
-                drawLivingEntity(fXpos, fYpos, size, lookSides, lookUpDown, living, delta,
-                        instance.settings.dollHeadMode == DollHeadMode.LOCKED);
+                drawLivingEntity(fXpos, fYpos, size, lookSides, lookUpDown, living, delta, lockXHeadRot, lockYHeadRot);
             } else {
-                drawEntity(fXpos, fYpos, size, lookSides, lookUpDown, playerEntity, delta,
-                        instance.settings.dollHeadMode == DollHeadMode.LOCKED);
+                drawEntity(fXpos, fYpos, size, lookSides, lookUpDown, playerEntity, delta, lockYHeadRot);
             }
         }
 
@@ -158,7 +158,7 @@ public class PaperDollRenderer {
 
     // Modified version from InventoryScreen
     private void drawLivingEntity(double xpos, double ypos, int size, float lookSides, float lookUpDown,
-            LivingEntity livingEntity, float delta, boolean lockHead) {
+            LivingEntity livingEntity, float delta, boolean lockHeadXRot, boolean lockHeadYRot) {
         float rotationSide = (float) Math.atan((double) (lookSides / 40.0F));
         float rotationUp = (float) Math.atan((double) (lookUpDown / 40.0F));
         if (livingEntity.isFallFlying() || livingEntity.isAutoSpinAttack()) {
@@ -212,14 +212,19 @@ public class PaperDollRenderer {
         }
         if (livingEntity.isFallFlying() || livingEntity.isAutoSpinAttack()) {
             livingEntity.setDeltaMovement(Vec3.ZERO);
+            lockHeadXRot = (livingEntity.isFallFlying() && instance.settings.lockElytra)
+                    || (livingEntity.isAutoSpinAttack() && instance.settings.lockSpinning);
         }
-        if (lockHead || livingEntity.isFallFlying() || livingEntity.isAutoSpinAttack()) {
+        if (lockHeadXRot) {
             NMSHelper.setXRot(livingEntity, -rotationUp * 20.0F);
             livingEntity.xRotO = NMSHelper.getXRot(livingEntity);
+        }
+        if (lockHeadYRot) {
             livingEntity.yHeadRot = NMSHelper.getYRot(livingEntity);
             livingEntity.yHeadRotO = NMSHelper.getYRot(livingEntity);
         } else {
-            if (instance.settings.dollHeadMode == DollHeadMode.FREE) {
+            if (instance.settings.dollHeadMode == DollHeadMode.FREE
+                    || instance.settings.dollHeadMode == DollHeadMode.FREE_HORIZONTAL) {
                 livingEntity.yHeadRot = rot + rotationSide * 40.0F - (yBodyRot - yHeadRot);
                 livingEntity.yHeadRotO = rot + rotationSide * 40.0F - (yBodyRotO - yHeadRotO);
             } else {
