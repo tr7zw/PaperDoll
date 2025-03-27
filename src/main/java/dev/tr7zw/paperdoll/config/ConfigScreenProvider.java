@@ -2,6 +2,7 @@ package dev.tr7zw.paperdoll.config;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Locale;
 
 import dev.tr7zw.paperdoll.gui.widget.PaperDollPreviewDummyWidget;
 import dev.tr7zw.paperdoll.PaperDollSettings;
@@ -58,15 +59,36 @@ public class ConfigScreenProvider {
                     (i) -> inst.settings.dollLookingSides = i));
             generalOptions.add(getIntOption("text.paperdoll.lookingUpDown", -80, 80, () -> inst.settings.dollLookingUpDown,
                     (i) -> inst.settings.dollLookingUpDown = i));
-            generalOptions.add(getOnOffOption("text.paperdoll.autohide", () -> inst.settings.autoHide,
-                    (b) -> inst.settings.autoHide = b));
-            generalOptions.add(getOnOffOption("text.paperdoll.hideInF5", () -> inst.settings.hideInF5,
-                    (b) -> inst.settings.hideInF5 = b));
 
             var generalOptionList = createOptionList(generalOptions);
             generalOptionList.setGap(-1);
             generalOptionList.setSize(14 * 20, 9 * 20);
             wTabPanel.add(generalOptionList, b -> b.title(ComponentProvider.translatable("text.paperdoll.tab.general_options")));
+
+            List<OptionInstance> autoHideOptions = new ArrayList<>();
+            autoHideOptions.add(getOnOffOption("text.paperdoll.autohide", () -> inst.settings.autoHide,
+                    (b) -> inst.settings.autoHide = b));
+            autoHideOptions.add(getOnOffOption("text.paperdoll.hideInF5", () -> inst.settings.hideInF5,
+                    (b) -> inst.settings.hideInF5 = b));
+
+            autoHideOptions.add(getSplitLine("text.paperdoll.category.auto_hide_exceptions"));
+            for (PaperDollSettings.AutoHideException condition : PaperDollSettings.AutoHideException.values()) {
+                autoHideOptions.add(
+                    getOnOffOption("text.paperdoll.auto_hide." + condition.name().toLowerCase(Locale.US),
+                        () -> !inst.settings.autoHideBlacklist.contains(condition),
+                        (b) -> {
+                            if (b) inst.settings.autoHideBlacklist.remove(condition);
+                            else inst.settings.autoHideBlacklist.add(condition);
+                        }
+                    )
+                );
+            }
+
+            var autoHideOptionList = createOptionList(autoHideOptions);
+            autoHideOptionList.setGap(-1);
+            autoHideOptionList.setSize(14 * 20, 9 * 20);
+
+            wTabPanel.add(autoHideOptionList, b -> b.title(ComponentProvider.translatable("text.paperdoll.tab.auto_hide_options")));
 
             root.add(wTabPanel, 0, 1);
 
