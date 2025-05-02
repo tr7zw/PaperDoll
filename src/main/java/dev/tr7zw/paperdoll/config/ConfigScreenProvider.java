@@ -5,6 +5,7 @@ import java.util.List;
 import java.util.Locale;
 
 import dev.tr7zw.paperdoll.gui.widget.PaperDollPreviewDummyWidget;
+import dev.tr7zw.transition.mc.ComponentProvider;
 import dev.tr7zw.paperdoll.PaperDollSettings;
 import dev.tr7zw.paperdoll.PaperDollSettings.DollHeadMode;
 import dev.tr7zw.paperdoll.PaperDollSettings.PaperDollLocation;
@@ -15,7 +16,6 @@ import dev.tr7zw.trender.gui.widget.WButton;
 import dev.tr7zw.trender.gui.widget.WGridPanel;
 import dev.tr7zw.trender.gui.widget.WTabPanel;
 import dev.tr7zw.trender.gui.widget.data.Insets;
-import dev.tr7zw.util.ComponentProvider;
 import lombok.experimental.UtilityClass;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.screens.Screen;
@@ -81,6 +81,11 @@ public class ConfigScreenProvider {
 
             autoHideOptions.add(getSplitLine("text.paperdoll.category.auto_hide_exceptions"));
             for (PaperDollSettings.AutoHideException condition : PaperDollSettings.AutoHideException.values()) {
+                //#if MC < 11700
+                //$$ if (condition == PaperDollSettings.AutoHideException.IN_POWDER_SNOW) {
+                //$$     continue;
+                //$$ }
+                //#endif
                 autoHideOptions
                         .add(getOnOffOption("text.paperdoll.auto_hide." + condition.name().toLowerCase(Locale.US),
                                 () -> !inst.settings.autoHideBlacklist.contains(condition), (b) -> {

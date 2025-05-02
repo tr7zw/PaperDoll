@@ -1,5 +1,5 @@
 version: '0.0.2'
-source: "https://github.com/tr7zw/ProcessedModTemplate/tree/master"
+source: "https://github.com/tr7zw/ProcessedModTemplate/tree/libworld"
 replacements:
   name: "Paperdoll"
   id: "paperdoll"
@@ -20,6 +20,8 @@ enabledFlags:
   - publishForge
   - modrinth
   - curseforge
+  - includeLibs
+  - addTRansitionLib
   - addTRenderLib
 rootProject:
   template: "."

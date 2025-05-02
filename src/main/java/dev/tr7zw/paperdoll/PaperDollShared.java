@@ -13,7 +13,7 @@ import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 
 import dev.tr7zw.paperdoll.config.ConfigScreenProvider;
-import dev.tr7zw.util.ModLoaderUtil;
+import dev.tr7zw.transition.loader.ModLoaderUtil;
 //#if FORGE || NEOFORGE
 //$$ import dev.tr7zw.paperdoll.forge.PaperDollEvents;
 //#endif

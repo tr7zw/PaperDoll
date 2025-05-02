@@ -14,7 +14,8 @@ import com.mojang.blaze3d.systems.RenderSystem;
 import com.mojang.blaze3d.vertex.PoseStack;
 
 import dev.tr7zw.paperdoll.PaperDollSettings.DollHeadMode;
-import dev.tr7zw.util.NMSHelper;
+import dev.tr7zw.transition.mc.EntityUtil;
+import dev.tr7zw.transition.mc.MathUtil;
 import net.minecraft.client.CameraType;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.MultiBufferSource;
@@ -176,19 +177,19 @@ public class PaperDollRenderer {
         //$$ int rot = 180;
         //#endif
         //#if MC >= 11903
-        Quaternionf quaternion = NMSHelper.ZP.rotationDegrees(180.0F);
-        Quaternionf quaternion2 = NMSHelper.XP.rotationDegrees(rotationUp * 20.0F);
+        Quaternionf quaternion = MathUtil.ZP.rotationDegrees(180.0F);
+        Quaternionf quaternion2 = MathUtil.XP.rotationDegrees(rotationUp * 20.0F);
         //#else
-        //$$Quaternion quaternion = NMSHelper.ZP.rotationDegrees(180.0F);
-        //$$Quaternion quaternion2 = NMSHelper.XP.rotationDegrees(rotationUp * 20.0F);
+        //$$Quaternion quaternion = MathUtil.ZP.rotationDegrees(180.0F);
+        //$$Quaternion quaternion2 = MathUtil.XP.rotationDegrees(rotationUp * 20.0F);
         //#endif
         quaternion.mul(quaternion2);
         matrixStack.mulPose(quaternion);
         float yBodyRot = livingEntity.yBodyRot;
-        float yRot = NMSHelper.getYRot(livingEntity);
+        float yRot = EntityUtil.getYRot(livingEntity);
         float yRotO = livingEntity.yRotO;
         float yBodyRotO = livingEntity.yBodyRotO;
-        float xRot = NMSHelper.getXRot(livingEntity);
+        float xRot = EntityUtil.getXRot(livingEntity);
         float xRotO = livingEntity.xRotO;
         float yHeadRotO = livingEntity.yHeadRotO;
         float yHeadRot = livingEntity.yHeadRot;
@@ -196,9 +197,9 @@ public class PaperDollRenderer {
         float vehicleYBodyRot = 0;
         float vehicleYBodyRotO = 0;
         livingEntity.yBodyRot = rot + rotationSide * 20.0F;
-        NMSHelper.setYRot(livingEntity, rot + rotationSide * 40.0F);
+        EntityUtil.setYRot(livingEntity, rot + rotationSide * 40.0F);
         livingEntity.yBodyRotO = livingEntity.yBodyRot;
-        livingEntity.yRotO = NMSHelper.getYRot(livingEntity);
+        livingEntity.yRotO = EntityUtil.getYRot(livingEntity);
         Vec3 lastDeltaMovement = null;
         if (livingEntity instanceof PlayerAccess player) {
             lastDeltaMovement = player.getLastDelataMovement();
@@ -216,12 +217,12 @@ public class PaperDollRenderer {
                     || (livingEntity.isAutoSpinAttack() && instance.settings.lockSpinning);
         }
         if (lockHeadXRot) {
-            NMSHelper.setXRot(livingEntity, -rotationUp * 20.0F);
-            livingEntity.xRotO = NMSHelper.getXRot(livingEntity);
+            EntityUtil.setXRot(livingEntity, -rotationUp * 20.0F);
+            livingEntity.xRotO = EntityUtil.getXRot(livingEntity);
         }
         if (lockHeadYRot) {
-            livingEntity.yHeadRot = NMSHelper.getYRot(livingEntity);
-            livingEntity.yHeadRotO = NMSHelper.getYRot(livingEntity);
+            livingEntity.yHeadRot = EntityUtil.getYRot(livingEntity);
+            livingEntity.yHeadRotO = EntityUtil.getYRot(livingEntity);
         } else {
             if (instance.settings.dollHeadMode == DollHeadMode.FREE
                     || instance.settings.dollHeadMode == DollHeadMode.FREE_HORIZONTAL) {
@@ -245,8 +246,8 @@ public class PaperDollRenderer {
             Entity vehicle = livingEntity.getVehicle();
             double offsetXTmp = livingEntity.getX() - vehicle.getX();
             double offsetZTmp = livingEntity.getZ() - vehicle.getZ();
-            float rotation = NMSHelper.getYRot(vehicle) - rot - rotationSide * 20.0F; // target is 180
-            rotation *= NMSHelper.DEG_TO_RAD;
+            float rotation = EntityUtil.getYRot(vehicle) - rot - rotationSide * 20.0F; // target is 180
+            rotation *= MathUtil.DEG_TO_RAD;
             rotation *= -1;
             offsetX += Math.cos(rotation) * offsetXTmp - Math.sin(rotation) * offsetZTmp;
             offsetZ += Math.sin(rotation) * offsetXTmp + Math.cos(rotation) * offsetZTmp;
@@ -268,9 +269,9 @@ public class PaperDollRenderer {
         }
         livingEntity.yBodyRot = yBodyRot;
         livingEntity.yBodyRotO = yBodyRotO;
-        NMSHelper.setYRot(livingEntity, yRot);
+        EntityUtil.setYRot(livingEntity, yRot);
         livingEntity.yRotO = yRotO;
-        NMSHelper.setXRot(livingEntity, xRot);
+        EntityUtil.setXRot(livingEntity, xRot);
         livingEntity.xRotO = xRotO;
         livingEntity.yHeadRotO = yHeadRotO;
         livingEntity.yHeadRot = yHeadRot;
@@ -355,31 +356,31 @@ public class PaperDollRenderer {
         //$$ int rot = 180;
         //#endif
         //#if MC >= 11903
-        Quaternionf quaternion = NMSHelper.ZP.rotationDegrees(180.0F);
-        Quaternionf quaternion2 = NMSHelper.XP.rotationDegrees(rotationUp * 20.0F);
+        Quaternionf quaternion = MathUtil.ZP.rotationDegrees(180.0F);
+        Quaternionf quaternion2 = MathUtil.XP.rotationDegrees(rotationUp * 20.0F);
         //#else
-        //$$Quaternion quaternion = NMSHelper.ZP.rotationDegrees(180.0F);
-        //$$Quaternion quaternion2 = NMSHelper.XP.rotationDegrees(rotationUp * 20.0F);
+        //$$Quaternion quaternion = MathUtil.ZP.rotationDegrees(180.0F);
+        //$$Quaternion quaternion2 = MathUtil.XP.rotationDegrees(rotationUp * 20.0F);
         //#endif
         quaternion.mul(quaternion2);
         matrixStack.mulPose(quaternion);
-        float yRot = NMSHelper.getYRot(entity);
+        float yRot = EntityUtil.getYRot(entity);
         float yRotO = entity.yRotO;
-        float xRot = NMSHelper.getXRot(entity);
+        float xRot = EntityUtil.getXRot(entity);
         float xRotO = entity.xRotO;
         Vec3 vel = entity.getDeltaMovement();
         Vec3 pos = entity.position();
         double yOld = entity.yOld;
-        NMSHelper.setYRot(entity, 0);
-        entity.yRotO = NMSHelper.getYRot(entity);
+        EntityUtil.setYRot(entity, 0);
+        entity.yRotO = EntityUtil.getYRot(entity);
         entity.setDeltaMovement(Vec3.ZERO);
         //#if MC >= 11700
         entity.setPos(pos.add(0, 500, 0)); // hack to disconnect minecarts from rails for the rendering
         //#endif
         entity.yOld += 500;
         if (lockHead) {
-            NMSHelper.setXRot(entity, -rotationUp * 20.0F);
-            entity.xRotO = NMSHelper.getXRot(entity);
+            EntityUtil.setXRot(entity, -rotationUp * 20.0F);
+            entity.xRotO = EntityUtil.getXRot(entity);
         }
         prepareLighting();
         EntityRenderDispatcher entityRenderDispatcher = mc_instance.getEntityRenderDispatcher();
@@ -402,9 +403,9 @@ public class PaperDollRenderer {
         //#endif
         bufferSource.endBatch();
         entityRenderDispatcher.setRenderShadow(true);
-        NMSHelper.setYRot(entity, yRot);
+        EntityUtil.setYRot(entity, yRot);
         entity.yRotO = yRotO;
-        NMSHelper.setXRot(entity, xRot);
+        EntityUtil.setXRot(entity, xRot);
         entity.xRotO = xRotO;
         entity.setDeltaMovement(vel);
         //#if MC >= 11700
