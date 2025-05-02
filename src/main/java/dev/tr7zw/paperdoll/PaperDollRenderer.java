@@ -3,12 +3,6 @@ package dev.tr7zw.paperdoll;
 import java.util.Set;
 import java.util.stream.Stream;
 
-//#if MC >= 11903
-import org.joml.Quaternionf;
-//#else
-//$$ import com.mojang.math.Quaternion;
-//#endif
-
 import com.mojang.blaze3d.platform.Lighting;
 import com.mojang.blaze3d.systems.RenderSystem;
 import com.mojang.blaze3d.vertex.PoseStack;
@@ -176,13 +170,8 @@ public class PaperDollRenderer {
         //#else
         //$$ int rot = 180;
         //#endif
-        //#if MC >= 11903
-        Quaternionf quaternion = MathUtil.ZP.rotationDegrees(180.0F);
-        Quaternionf quaternion2 = MathUtil.XP.rotationDegrees(rotationUp * 20.0F);
-        //#else
-        //$$Quaternion quaternion = MathUtil.ZP.rotationDegrees(180.0F);
-        //$$Quaternion quaternion2 = MathUtil.XP.rotationDegrees(rotationUp * 20.0F);
-        //#endif
+        var quaternion = MathUtil.ZP.rotationDegrees(180.0F);
+        var quaternion2 = MathUtil.XP.rotationDegrees(rotationUp * 20.0F);
         quaternion.mul(quaternion2);
         matrixStack.mulPose(quaternion);
         float yBodyRot = livingEntity.yBodyRot;
@@ -235,7 +224,7 @@ public class PaperDollRenderer {
         }
         prepareLighting();
         EntityRenderDispatcher entityRenderDispatcher = mc_instance.getEntityRenderDispatcher();
-        conjugate(quaternion2);
+        MathUtil.conjugate(quaternion2);
         entityRenderDispatcher.overrideCameraOrientation(quaternion2);
         entityRenderDispatcher.setRenderShadow(false);
         MultiBufferSource.BufferSource bufferSource = Minecraft.getInstance().renderBuffers().bufferSource();
@@ -330,15 +319,6 @@ public class PaperDollRenderer {
         //#endif
     }
 
-    //#if MC >= 11903
-    private void conjugate(Quaternionf quaternion2) {
-        quaternion2.conjugate();
-        //#else
-        //$$     private void conjugate(Quaternion quaternion2) {
-        //$$ quaternion2.conj();
-        //#endif
-    }
-
     private void drawEntity(double xpos, double ypos, int size, float lookSides, float lookUpDown, Entity entity,
             float delta, boolean lockHead) {
         float rotationSide = (float) Math.atan((double) (lookSides / 40.0F));
@@ -355,13 +335,8 @@ public class PaperDollRenderer {
         //#else
         //$$ int rot = 180;
         //#endif
-        //#if MC >= 11903
-        Quaternionf quaternion = MathUtil.ZP.rotationDegrees(180.0F);
-        Quaternionf quaternion2 = MathUtil.XP.rotationDegrees(rotationUp * 20.0F);
-        //#else
-        //$$Quaternion quaternion = MathUtil.ZP.rotationDegrees(180.0F);
-        //$$Quaternion quaternion2 = MathUtil.XP.rotationDegrees(rotationUp * 20.0F);
-        //#endif
+        var quaternion = MathUtil.ZP.rotationDegrees(180.0F);
+        var quaternion2 = MathUtil.XP.rotationDegrees(rotationUp * 20.0F);
         quaternion.mul(quaternion2);
         matrixStack.mulPose(quaternion);
         float yRot = EntityUtil.getYRot(entity);
@@ -384,7 +359,7 @@ public class PaperDollRenderer {
         }
         prepareLighting();
         EntityRenderDispatcher entityRenderDispatcher = mc_instance.getEntityRenderDispatcher();
-        conjugate(quaternion2);
+        MathUtil.conjugate(quaternion2);
         entityRenderDispatcher.overrideCameraOrientation(quaternion2);
         entityRenderDispatcher.setRenderShadow(false);
         MultiBufferSource.BufferSource bufferSource = Minecraft.getInstance().renderBuffers().bufferSource();
