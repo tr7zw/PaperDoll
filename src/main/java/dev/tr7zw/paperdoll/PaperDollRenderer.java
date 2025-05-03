@@ -1,19 +1,15 @@
 package dev.tr7zw.paperdoll;
 
+import java.util.Set;
 import java.util.stream.Stream;
-
-//#if MC >= 11903
-import org.joml.Quaternionf;
-//#else
-//$$ import com.mojang.math.Quaternion;
-//#endif
 
 import com.mojang.blaze3d.platform.Lighting;
 import com.mojang.blaze3d.systems.RenderSystem;
 import com.mojang.blaze3d.vertex.PoseStack;
 
 import dev.tr7zw.paperdoll.PaperDollSettings.DollHeadMode;
-import dev.tr7zw.util.NMSHelper;
+import dev.tr7zw.transition.mc.EntityUtil;
+import dev.tr7zw.transition.mc.MathUtil;
 import net.minecraft.client.CameraType;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.MultiBufferSource;
@@ -31,14 +27,19 @@ public class PaperDollRenderer {
     private long showTill = 0;
 
     public void render(float delta) {
-        //#if MC >= 12002
-        if (!instance.settings.dollEnabled || mc_instance.getDebugOverlay().showDebugScreen()
-        //#else
-        //$$ if (!instance.settings.dollEnabled || mc_instance.options.renderDebug
-        //#endif
-                || mc_instance.level == null || mc_instance.options.hideGui) {
+        if (!instance.settings.dollEnabled)
             return;
-        }
+        //#if MC >= 12002
+        if (mc_instance.getDebugOverlay().showDebugScreen())
+            return;
+        //#else
+        //$$ if (mc_instance.options.renderDebug)
+        //$$     return;
+        //#endif
+        if (mc_instance.level == null)
+            return;
+        if (mc_instance.options.hideGui)
+            return;
 
         int xpos = 0;
         int ypos = 0;
@@ -69,22 +70,7 @@ public class PaperDollRenderer {
                 : mc_instance.player;
 
         if (instance.settings.autoHide && playerEntity instanceof LivingEntity livingEntity) {
-            boolean hide = true;
-            // Movement
-            if (livingEntity.isCrouching() || livingEntity.isSprinting() || livingEntity.isFallFlying()
-                    || livingEntity.isPassenger() || livingEntity.isVisuallySwimming()) {
-                hide = false;
-            }
-            // combat
-            if (livingEntity.isBlocking() || livingEntity.isUsingItem() || livingEntity.swinging
-                    || livingEntity.isOnFire() || livingEntity.hurtTime > 0) {
-                hide = false;
-            }
-            //#if MC >= 11700
-            if (livingEntity.isInPowderSnow)
-                hide = false;
-            //#endif
-
+            boolean hide = shouldAutoHide(livingEntity);
             if (hide && System.currentTimeMillis() > showTill) {
                 return;
             }
@@ -100,31 +86,65 @@ public class PaperDollRenderer {
         Minecraft.getInstance().renderBuffers().bufferSource().endBatch();
         //#endif
 
-        if (playerEntity.isPassenger()) {
+        boolean lockYHeadRot = instance.settings.dollHeadMode == DollHeadMode.LOCKED;
+        boolean lockXHeadRot = lockYHeadRot || instance.settings.dollHeadMode == DollHeadMode.FREE_HORIZONTAL
+                || instance.settings.dollHeadMode == DollHeadMode.STATIC_HORIZONTAL;
+        if (!instance.settings.hideVehicle && playerEntity.isPassenger()) {
             Entity vehicle = playerEntity.getRootVehicle();
             getPassengersAndSelf(vehicle).forEachOrdered(entity -> {
                 double yOffset = fYpos;
                 if (entity != playerEntity)
                     yOffset += (playerEntity.getY() - entity.getY()) * size;
                 if (entity instanceof LivingEntity living) {
-                    drawLivingEntity(fXpos, yOffset, size, lookSides, lookUpDown, living, delta,
-                            instance.settings.dollHeadMode == DollHeadMode.LOCKED);
+                    drawLivingEntity(fXpos, yOffset, size, lookSides, lookUpDown, living, delta, lockXHeadRot,
+                            lockYHeadRot);
                 } else {
                     // yOffset -= 10;
-                    drawEntity(fXpos, yOffset, size, lookSides, lookUpDown, entity, delta,
-                            instance.settings.dollHeadMode == DollHeadMode.LOCKED);
+                    drawEntity(fXpos, yOffset, size, lookSides, lookUpDown, entity, delta, lockYHeadRot);
                 }
             });
         } else {
             if (playerEntity instanceof LivingEntity living) {
-                drawLivingEntity(fXpos, fYpos, size, lookSides, lookUpDown, living, delta,
-                        instance.settings.dollHeadMode == DollHeadMode.LOCKED);
+                drawLivingEntity(fXpos, fYpos, size, lookSides, lookUpDown, living, delta, lockXHeadRot, lockYHeadRot);
             } else {
-                drawEntity(fXpos, fYpos, size, lookSides, lookUpDown, playerEntity, delta,
-                        instance.settings.dollHeadMode == DollHeadMode.LOCKED);
+                drawEntity(fXpos, fYpos, size, lookSides, lookUpDown, playerEntity, delta, lockYHeadRot);
             }
         }
 
+    }
+
+    private boolean shouldAutoHide(LivingEntity livingEntity) {
+        Set<PaperDollSettings.AutoHideException> blacklist = instance.settings.autoHideBlacklist;
+
+        // Movement
+        if (livingEntity.isCrouching() && !blacklist.contains(PaperDollSettings.AutoHideException.CROUCHING))
+            return false;
+        if (livingEntity.isSprinting() && !blacklist.contains(PaperDollSettings.AutoHideException.RUNNING))
+            return false;
+        if (livingEntity.isFallFlying() && !blacklist.contains(PaperDollSettings.AutoHideException.FALL_FLYING))
+            return false;
+        if (livingEntity.isVisuallySwimming() && !blacklist.contains(PaperDollSettings.AutoHideException.SWIMMING))
+            return false;
+        if (livingEntity.isPassenger() && !blacklist.contains(PaperDollSettings.AutoHideException.IN_VEHICLE))
+            return false;
+
+        // Combat
+        if (livingEntity.isBlocking() && !blacklist.contains(PaperDollSettings.AutoHideException.BLOCKING))
+            return false;
+        if (livingEntity.isUsingItem() && !blacklist.contains(PaperDollSettings.AutoHideException.USING_ITEM))
+            return false;
+        if (livingEntity.swinging && !blacklist.contains(PaperDollSettings.AutoHideException.SWINGING))
+            return false;
+        if (livingEntity.hurtTime > 0 && !blacklist.contains(PaperDollSettings.AutoHideException.TAKING_DAMAGE))
+            return false;
+        if (livingEntity.isOnFire() && !blacklist.contains(PaperDollSettings.AutoHideException.ON_FIRE))
+            return false;
+        //#if MC >= 11700
+        if (livingEntity.isInPowderSnow && !blacklist.contains(PaperDollSettings.AutoHideException.IN_POWDER_SNOW))
+            return false;
+        //#endif
+
+        return true;
     }
 
     public Stream<Entity> getPassengersAndSelf(Entity vehicle) {
@@ -133,7 +153,7 @@ public class PaperDollRenderer {
 
     // Modified version from InventoryScreen
     private void drawLivingEntity(double xpos, double ypos, int size, float lookSides, float lookUpDown,
-            LivingEntity livingEntity, float delta, boolean lockHead) {
+            LivingEntity livingEntity, float delta, boolean lockHeadXRot, boolean lockHeadYRot) {
         float rotationSide = (float) Math.atan((double) (lookSides / 40.0F));
         float rotationUp = (float) Math.atan((double) (lookUpDown / 40.0F));
         if (livingEntity.isFallFlying() || livingEntity.isAutoSpinAttack()) {
@@ -150,20 +170,15 @@ public class PaperDollRenderer {
         //#else
         //$$ int rot = 180;
         //#endif
-        //#if MC >= 11903
-        Quaternionf quaternion = NMSHelper.ZP.rotationDegrees(180.0F);
-        Quaternionf quaternion2 = NMSHelper.XP.rotationDegrees(rotationUp * 20.0F);
-        //#else
-        //$$Quaternion quaternion = NMSHelper.ZP.rotationDegrees(180.0F);
-        //$$Quaternion quaternion2 = NMSHelper.XP.rotationDegrees(rotationUp * 20.0F);
-        //#endif
+        var quaternion = MathUtil.ZP.rotationDegrees(180.0F);
+        var quaternion2 = MathUtil.XP.rotationDegrees(rotationUp * 20.0F);
         quaternion.mul(quaternion2);
         matrixStack.mulPose(quaternion);
         float yBodyRot = livingEntity.yBodyRot;
-        float yRot = NMSHelper.getYRot(livingEntity);
+        float yRot = EntityUtil.getYRot(livingEntity);
         float yRotO = livingEntity.yRotO;
         float yBodyRotO = livingEntity.yBodyRotO;
-        float xRot = NMSHelper.getXRot(livingEntity);
+        float xRot = EntityUtil.getXRot(livingEntity);
         float xRotO = livingEntity.xRotO;
         float yHeadRotO = livingEntity.yHeadRotO;
         float yHeadRot = livingEntity.yHeadRot;
@@ -171,9 +186,9 @@ public class PaperDollRenderer {
         float vehicleYBodyRot = 0;
         float vehicleYBodyRotO = 0;
         livingEntity.yBodyRot = rot + rotationSide * 20.0F;
-        NMSHelper.setYRot(livingEntity, rot + rotationSide * 40.0F);
+        EntityUtil.setYRot(livingEntity, rot + rotationSide * 40.0F);
         livingEntity.yBodyRotO = livingEntity.yBodyRot;
-        livingEntity.yRotO = NMSHelper.getYRot(livingEntity);
+        livingEntity.yRotO = EntityUtil.getYRot(livingEntity);
         Vec3 lastDeltaMovement = null;
         if (livingEntity instanceof PlayerAccess player) {
             lastDeltaMovement = player.getLastDelataMovement();
@@ -187,14 +202,19 @@ public class PaperDollRenderer {
         }
         if (livingEntity.isFallFlying() || livingEntity.isAutoSpinAttack()) {
             livingEntity.setDeltaMovement(Vec3.ZERO);
+            lockHeadXRot = (livingEntity.isFallFlying() && instance.settings.lockElytra)
+                    || (livingEntity.isAutoSpinAttack() && instance.settings.lockSpinning);
         }
-        if (lockHead || livingEntity.isFallFlying() || livingEntity.isAutoSpinAttack()) {
-            NMSHelper.setXRot(livingEntity, -rotationUp * 20.0F);
-            livingEntity.xRotO = NMSHelper.getXRot(livingEntity);
-            livingEntity.yHeadRot = NMSHelper.getYRot(livingEntity);
-            livingEntity.yHeadRotO = NMSHelper.getYRot(livingEntity);
+        if (lockHeadXRot) {
+            EntityUtil.setXRot(livingEntity, -rotationUp * 20.0F);
+            livingEntity.xRotO = EntityUtil.getXRot(livingEntity);
+        }
+        if (lockHeadYRot) {
+            livingEntity.yHeadRot = EntityUtil.getYRot(livingEntity);
+            livingEntity.yHeadRotO = EntityUtil.getYRot(livingEntity);
         } else {
-            if (instance.settings.dollHeadMode == DollHeadMode.FREE) {
+            if (instance.settings.dollHeadMode == DollHeadMode.FREE
+                    || instance.settings.dollHeadMode == DollHeadMode.FREE_HORIZONTAL) {
                 livingEntity.yHeadRot = rot + rotationSide * 40.0F - (yBodyRot - yHeadRot);
                 livingEntity.yHeadRotO = rot + rotationSide * 40.0F - (yBodyRotO - yHeadRotO);
             } else {
@@ -204,7 +224,7 @@ public class PaperDollRenderer {
         }
         prepareLighting();
         EntityRenderDispatcher entityRenderDispatcher = mc_instance.getEntityRenderDispatcher();
-        conjugate(quaternion2);
+        MathUtil.conjugate(quaternion2);
         entityRenderDispatcher.overrideCameraOrientation(quaternion2);
         entityRenderDispatcher.setRenderShadow(false);
         MultiBufferSource.BufferSource bufferSource = Minecraft.getInstance().renderBuffers().bufferSource();
@@ -215,8 +235,8 @@ public class PaperDollRenderer {
             Entity vehicle = livingEntity.getVehicle();
             double offsetXTmp = livingEntity.getX() - vehicle.getX();
             double offsetZTmp = livingEntity.getZ() - vehicle.getZ();
-            float rotation = NMSHelper.getYRot(vehicle) - rot - rotationSide * 20.0F; // target is 180
-            rotation *= NMSHelper.DEG_TO_RAD;
+            float rotation = EntityUtil.getYRot(vehicle) - rot - rotationSide * 20.0F; // target is 180
+            rotation *= MathUtil.DEG_TO_RAD;
             rotation *= -1;
             offsetX += Math.cos(rotation) * offsetXTmp - Math.sin(rotation) * offsetZTmp;
             offsetZ += Math.sin(rotation) * offsetXTmp + Math.cos(rotation) * offsetZTmp;
@@ -238,9 +258,9 @@ public class PaperDollRenderer {
         }
         livingEntity.yBodyRot = yBodyRot;
         livingEntity.yBodyRotO = yBodyRotO;
-        NMSHelper.setYRot(livingEntity, yRot);
+        EntityUtil.setYRot(livingEntity, yRot);
         livingEntity.yRotO = yRotO;
-        NMSHelper.setXRot(livingEntity, xRot);
+        EntityUtil.setXRot(livingEntity, xRot);
         livingEntity.xRotO = xRotO;
         livingEntity.yHeadRotO = yHeadRotO;
         livingEntity.yHeadRot = yHeadRot;
@@ -299,15 +319,6 @@ public class PaperDollRenderer {
         //#endif
     }
 
-    //#if MC >= 11903
-    private void conjugate(Quaternionf quaternion2) {
-        quaternion2.conjugate();
-        //#else
-        //$$     private void conjugate(Quaternion quaternion2) {
-        //$$ quaternion2.conj();
-        //#endif
-    }
-
     private void drawEntity(double xpos, double ypos, int size, float lookSides, float lookUpDown, Entity entity,
             float delta, boolean lockHead) {
         float rotationSide = (float) Math.atan((double) (lookSides / 40.0F));
@@ -324,36 +335,31 @@ public class PaperDollRenderer {
         //#else
         //$$ int rot = 180;
         //#endif
-        //#if MC >= 11903
-        Quaternionf quaternion = NMSHelper.ZP.rotationDegrees(180.0F);
-        Quaternionf quaternion2 = NMSHelper.XP.rotationDegrees(rotationUp * 20.0F);
-        //#else
-        //$$Quaternion quaternion = NMSHelper.ZP.rotationDegrees(180.0F);
-        //$$Quaternion quaternion2 = NMSHelper.XP.rotationDegrees(rotationUp * 20.0F);
-        //#endif
+        var quaternion = MathUtil.ZP.rotationDegrees(180.0F);
+        var quaternion2 = MathUtil.XP.rotationDegrees(rotationUp * 20.0F);
         quaternion.mul(quaternion2);
         matrixStack.mulPose(quaternion);
-        float yRot = NMSHelper.getYRot(entity);
+        float yRot = EntityUtil.getYRot(entity);
         float yRotO = entity.yRotO;
-        float xRot = NMSHelper.getXRot(entity);
+        float xRot = EntityUtil.getXRot(entity);
         float xRotO = entity.xRotO;
         Vec3 vel = entity.getDeltaMovement();
         Vec3 pos = entity.position();
         double yOld = entity.yOld;
-        NMSHelper.setYRot(entity, 0);
-        entity.yRotO = NMSHelper.getYRot(entity);
+        EntityUtil.setYRot(entity, 0);
+        entity.yRotO = EntityUtil.getYRot(entity);
         entity.setDeltaMovement(Vec3.ZERO);
         //#if MC >= 11700
         entity.setPos(pos.add(0, 500, 0)); // hack to disconnect minecarts from rails for the rendering
         //#endif
         entity.yOld += 500;
         if (lockHead) {
-            NMSHelper.setXRot(entity, -rotationUp * 20.0F);
-            entity.xRotO = NMSHelper.getXRot(entity);
+            EntityUtil.setXRot(entity, -rotationUp * 20.0F);
+            entity.xRotO = EntityUtil.getXRot(entity);
         }
         prepareLighting();
         EntityRenderDispatcher entityRenderDispatcher = mc_instance.getEntityRenderDispatcher();
-        conjugate(quaternion2);
+        MathUtil.conjugate(quaternion2);
         entityRenderDispatcher.overrideCameraOrientation(quaternion2);
         entityRenderDispatcher.setRenderShadow(false);
         MultiBufferSource.BufferSource bufferSource = Minecraft.getInstance().renderBuffers().bufferSource();
@@ -372,9 +378,9 @@ public class PaperDollRenderer {
         //#endif
         bufferSource.endBatch();
         entityRenderDispatcher.setRenderShadow(true);
-        NMSHelper.setYRot(entity, yRot);
+        EntityUtil.setYRot(entity, yRot);
         entity.yRotO = yRotO;
-        NMSHelper.setXRot(entity, xRot);
+        EntityUtil.setXRot(entity, xRot);
         entity.xRotO = xRotO;
         entity.setDeltaMovement(vel);
         //#if MC >= 11700
