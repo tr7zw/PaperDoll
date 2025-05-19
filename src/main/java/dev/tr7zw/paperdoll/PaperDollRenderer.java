@@ -22,11 +22,11 @@ import net.minecraft.world.phys.Vec3;
 
 public class PaperDollRenderer {
 
-    private final Minecraft mc_instance = Minecraft.getInstance();
     private final PaperDollShared instance = PaperDollShared.instance;
     private long showTill = 0;
 
     public void render(float delta) {
+        Minecraft mc_instance = Minecraft.getInstance();
         if (!instance.settings.dollEnabled)
             return;
         //#if MC >= 12002
@@ -154,6 +154,7 @@ public class PaperDollRenderer {
     // Modified version from InventoryScreen
     private void drawLivingEntity(double xpos, double ypos, int size, float lookSides, float lookUpDown,
             LivingEntity livingEntity, float delta, boolean lockHeadXRot, boolean lockHeadYRot) {
+        Minecraft mc_instance = Minecraft.getInstance();
         float rotationSide = (float) Math.atan((double) (lookSides / 40.0F));
         float rotationUp = (float) Math.atan((double) (lookUpDown / 40.0F));
         if (livingEntity.isFallFlying() || livingEntity.isAutoSpinAttack()) {
@@ -321,6 +322,7 @@ public class PaperDollRenderer {
 
     private void drawEntity(double xpos, double ypos, int size, float lookSides, float lookUpDown, Entity entity,
             float delta, boolean lockHead) {
+        Minecraft mc_instance = Minecraft.getInstance();
         float rotationSide = (float) Math.atan((double) (lookSides / 40.0F));
         float rotationUp = (float) Math.atan((double) (lookUpDown / 40.0F));
         if (mc_instance.player.isFallFlying() || mc_instance.player.isAutoSpinAttack()) {

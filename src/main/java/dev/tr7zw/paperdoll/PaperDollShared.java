@@ -29,6 +29,7 @@ public class PaperDollShared {
     private boolean toggleKeybindPressed = false;
     public PaperDollSettings settings = new PaperDollSettings();
     public PaperDollRenderer renderer;
+    private boolean initialized = false;
 
     public void init() {
         instance = this;
@@ -36,7 +37,6 @@ public class PaperDollShared {
         renderer = new PaperDollRenderer();
         ModLoaderUtil.disableDisplayTest();
         ModLoaderUtil.registerConfigScreen(ConfigScreenProvider::createConfigScreen);
-        ModLoaderUtil.registerKeybind(toggleKeybind);
         ModLoaderUtil.registerClientTickListener(this::onClientTick);
         if (settingsFile.exists()) {
             try {
@@ -68,6 +68,10 @@ public class PaperDollShared {
     }
 
     public void onClientTick() {
+        if (!initialized) {
+            initialized = true;
+            ModLoaderUtil.registerKeybind(toggleKeybind);
+        }
         if (toggleKeybind.isDown()) {
             if (toggleKeybindPressed)
                 return;
