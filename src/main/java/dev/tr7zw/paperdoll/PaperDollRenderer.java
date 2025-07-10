@@ -9,7 +9,9 @@ import com.mojang.blaze3d.vertex.PoseStack;
 
 import dev.tr7zw.paperdoll.PaperDollSettings.DollHeadMode;
 import dev.tr7zw.transition.mc.EntityUtil;
+import dev.tr7zw.transition.mc.LightingUtil;
 import dev.tr7zw.transition.mc.MathUtil;
+import lombok.Setter;
 import net.minecraft.client.CameraType;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.MultiBufferSource;
@@ -24,6 +26,11 @@ public class PaperDollRenderer {
 
     private final PaperDollShared instance = PaperDollShared.instance;
     private long showTill = 0;
+
+    //#if MC >= 12106
+    @Setter
+    private net.minecraft.client.gui.GuiGraphics guiGraphics;
+    //#endif
 
     public void render(float delta) {
         Minecraft mc_instance = Minecraft.getInstance();
@@ -166,8 +173,10 @@ public class PaperDollRenderer {
         PoseStack matrixStack = new PoseStack();
         matrixStack.translate(0.0D, 0.0D, 1000.0D);
         matrixStack.scale((float) size, (float) size, (float) size);
-        //#if MC >= 12005
-        int rot = 0;
+        //#if MC >= 12106
+        int rot = 180;
+        //#elseif MC >= 12005
+        //$$ int rot = 0;
         //#else
         //$$ int rot = 180;
         //#endif
@@ -245,9 +254,17 @@ public class PaperDollRenderer {
         }
         // Mc renders the player in the inventory without delta, causing it to look
         // "laggy". Good luck unseeing this :)
-        //#if MC >= 12102
-        entityRenderDispatcher.render(livingEntity, offsetX, offsetY, offsetZ, delta, matrixStack, bufferSource,
-                15728880);
+        //#if MC >= 12106
+        float o = livingEntity.getScale();
+        var vector3f = new org.joml.Vector3f(0.0F, livingEntity.getBbHeight() / 2.0F + 0 * o, 0.0F);
+        float p = (float) size / o;
+        guiGraphics.submitEntityRenderState(
+                entityRenderDispatcher.getRenderer(livingEntity).createRenderState(livingEntity, delta), p, vector3f,
+                quaternion, quaternion2, (int) (xpos - size * o), (int) (ypos - size * o), (int) (xpos + size * o),
+                (int) (ypos + size * o));
+        //#elseif MC >= 12102
+        //$$entityRenderDispatcher.render(livingEntity, offsetX, offsetY, offsetZ, delta, matrixStack, bufferSource,
+        //$$        15728880);
         //#else
         //$$entityRenderDispatcher.render(livingEntity, offsetX, offsetY, offsetZ, 0.0F, delta, matrixStack, bufferSource,
         //$$        15728880);
@@ -274,7 +291,7 @@ public class PaperDollRenderer {
         // #else
         // $$ Lighting.setupFor3DItems();
         // #endif
-        Lighting.setupFor3DItems();
+
     }
 
     private void prepareViewMatrix(double xpos, double ypos) {
@@ -313,8 +330,10 @@ public class PaperDollRenderer {
     }
 
     private void prepareLighting() {
-        //#if MC >= 11700
-        Lighting.setupForEntityInInventory();
+        //#if MC >= 12106
+        LightingUtil.prepareLightingEntity();
+        //#elseif MC >= 11700
+        //$$ Lighting.setupForEntityInInventory();
         //#else
         //$$ Lighting.setupForFlatItems();
         //#endif
@@ -390,7 +409,6 @@ public class PaperDollRenderer {
         //#endif
         entity.yOld = yOld;
         resetViewMatrix();
-        Lighting.setupFor3DItems();
     }
 
 }

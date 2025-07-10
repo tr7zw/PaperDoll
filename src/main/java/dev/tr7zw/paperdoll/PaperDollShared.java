@@ -13,6 +13,7 @@ import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 
 import dev.tr7zw.paperdoll.config.ConfigScreenProvider;
+import dev.tr7zw.transition.loader.ModLoaderEventUtil;
 import dev.tr7zw.transition.loader.ModLoaderUtil;
 //#if FORGE || NEOFORGE
 //$$ import dev.tr7zw.paperdoll.forge.PaperDollEvents;
@@ -29,7 +30,6 @@ public class PaperDollShared {
     private boolean toggleKeybindPressed = false;
     public PaperDollSettings settings = new PaperDollSettings();
     public PaperDollRenderer renderer;
-    private boolean initialized = false;
 
     public void init() {
         instance = this;
@@ -37,7 +37,8 @@ public class PaperDollShared {
         renderer = new PaperDollRenderer();
         ModLoaderUtil.disableDisplayTest();
         ModLoaderUtil.registerConfigScreen(ConfigScreenProvider::createConfigScreen);
-        ModLoaderUtil.registerClientTickListener(this::onClientTick);
+        ModLoaderEventUtil.registerClientTickStartListener(this::onClientTick);
+        ModLoaderUtil.registerKeybind(toggleKeybind);
         if (settingsFile.exists()) {
             try {
                 settings = gson.fromJson(new String(Files.readAllBytes(settingsFile.toPath()), StandardCharsets.UTF_8),
@@ -54,6 +55,9 @@ public class PaperDollShared {
         //#if MC <= 12004 || NEOFORGE
         //$$ ModLoaderUtil.registerForgeEvent(new PaperDollEvents()::onOverlay);
         //#endif
+        //#if FORGE && MC >= 12105
+        //$$ //RenderGuiEvent.Post.EVENT.register(new PaperDollEvents()::onOverlay);
+        //#endif
         //#endif
     }
 
@@ -68,10 +72,6 @@ public class PaperDollShared {
     }
 
     public void onClientTick() {
-        if (!initialized) {
-            initialized = true;
-            ModLoaderUtil.registerKeybind(toggleKeybind);
-        }
         if (toggleKeybind.isDown()) {
             if (toggleKeybindPressed)
                 return;
