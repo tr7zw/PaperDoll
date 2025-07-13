@@ -31,7 +31,6 @@ public class GuiMixin {
     @Inject(at = @At("HEAD"), method = "render")
     public void render(GuiGraphics guiGraphics, DeltaTracker deltaTracker, CallbackInfo ci) {
         float delta = deltaTracker.getGameTimeDeltaPartialTick(true);
-        PaperDollShared.instance.renderer.setGuiGraphics(guiGraphics);
         //#elseif MC >= 12100
         //$$ @Shadow
         //$$ private LayeredDraw layers;

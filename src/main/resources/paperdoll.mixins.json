@@ -5,7 +5,9 @@
     "mixins": [],
     "client": [
         "GuiMixin",
-        "AbstractClientPlayerMixin"
+        "AbstractClientPlayerMixin",
+        "GuiRendererMixin",
+        "GameRendererMixin"
     ],
     "injectors": {
         "defaultRequire": 1

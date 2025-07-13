@@ -3,7 +3,6 @@ package dev.tr7zw.paperdoll;
 import java.util.Set;
 import java.util.stream.Stream;
 
-import com.mojang.blaze3d.platform.Lighting;
 import com.mojang.blaze3d.systems.RenderSystem;
 import com.mojang.blaze3d.vertex.PoseStack;
 
@@ -11,7 +10,6 @@ import dev.tr7zw.paperdoll.PaperDollSettings.DollHeadMode;
 import dev.tr7zw.transition.mc.EntityUtil;
 import dev.tr7zw.transition.mc.LightingUtil;
 import dev.tr7zw.transition.mc.MathUtil;
-import lombok.Setter;
 import net.minecraft.client.CameraType;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.MultiBufferSource;
@@ -26,11 +24,6 @@ public class PaperDollRenderer {
 
     private final PaperDollShared instance = PaperDollShared.instance;
     private long showTill = 0;
-
-    //#if MC >= 12106
-    @Setter
-    private net.minecraft.client.gui.GuiGraphics guiGraphics;
-    //#endif
 
     public void render(float delta) {
         Minecraft mc_instance = Minecraft.getInstance();
@@ -68,9 +61,14 @@ public class PaperDollRenderer {
             ypos = mc_instance.getWindow().getGuiScaledHeight() - (55 + instance.settings.dollYOffset);
             break;
         }
+        int size = 25 + instance.settings.dollSize;
+        //#if MC >= 12106
+        size += 26;
+        ypos -= 23;
+        //#endif
+        int fSize = size;
         int fXpos = xpos;
         int fYpos = ypos;
-        int size = 25 + instance.settings.dollSize;
         int lookSides = -instance.settings.dollLookingSides;
         int lookUpDown = instance.settings.dollLookingUpDown;
         Entity playerEntity = mc_instance.getCameraEntity() != null ? mc_instance.getCameraEntity()
@@ -101,13 +99,17 @@ public class PaperDollRenderer {
             getPassengersAndSelf(vehicle).forEachOrdered(entity -> {
                 double yOffset = fYpos;
                 if (entity != playerEntity)
-                    yOffset += (playerEntity.getY() - entity.getY()) * size;
+                    //#if MC >= 12106
+                    yOffset -= (playerEntity.getY() - entity.getY()) * fSize;
+                //#else
+                yOffset += (playerEntity.getY() - entity.getY()) * fSize;
+                //#endif
                 if (entity instanceof LivingEntity living) {
-                    drawLivingEntity(fXpos, yOffset, size, lookSides, lookUpDown, living, delta, lockXHeadRot,
+                    drawLivingEntity(fXpos, yOffset, fSize, lookSides, lookUpDown, living, delta, lockXHeadRot,
                             lockYHeadRot);
                 } else {
                     // yOffset -= 10;
-                    drawEntity(fXpos, yOffset, size, lookSides, lookUpDown, entity, delta, lockYHeadRot);
+                    drawEntity(fXpos, yOffset, fSize, lookSides, lookUpDown, entity, delta, lockYHeadRot);
                 }
             });
         } else {
@@ -255,13 +257,15 @@ public class PaperDollRenderer {
         // Mc renders the player in the inventory without delta, causing it to look
         // "laggy". Good luck unseeing this :)
         //#if MC >= 12106
-        float o = livingEntity.getScale();
-        var vector3f = new org.joml.Vector3f(0.0F, livingEntity.getBbHeight() / 2.0F + 0 * o, 0.0F);
+        float o = 2;
+        var vector3f = new org.joml.Vector3f((float) offsetX, livingEntity.getBbHeight() / 2.0F + 0 * o,
+                (float) offsetZ);
         float p = (float) size / o;
-        guiGraphics.submitEntityRenderState(
-                entityRenderDispatcher.getRenderer(livingEntity).createRenderState(livingEntity, delta), p, vector3f,
-                quaternion, quaternion2, (int) (xpos - size * o), (int) (ypos - size * o), (int) (xpos + size * o),
-                (int) (ypos + size * o));
+        ((dev.tr7zw.paperdoll.future.GameRendererAccessor) Minecraft.getInstance().gameRenderer).getGuiRenderState()
+                .submitPicturesInPictureState(new dev.tr7zw.paperdoll.future.CustomGuiEntityRenderState(
+                        entityRenderDispatcher.getRenderer(livingEntity).createRenderState(livingEntity, delta),
+                        matrixStack, vector3f, quaternion, quaternion2, (int) (xpos), (int) (ypos), (int) (xpos + size),
+                        (int) (ypos + size), p, xpos, ypos));
         //#elseif MC >= 12102
         //$$entityRenderDispatcher.render(livingEntity, offsetX, offsetY, offsetZ, delta, matrixStack, bufferSource,
         //$$        15728880);
@@ -289,7 +293,7 @@ public class PaperDollRenderer {
         }
         resetViewMatrix();
         // #else
-        // $$ Lighting.setupFor3DItems();
+        // $$ com.mojang.blaze3d.platform.Lighting.setupFor3DItems();
         // #endif
 
     }
@@ -333,9 +337,9 @@ public class PaperDollRenderer {
         //#if MC >= 12106
         LightingUtil.prepareLightingEntity();
         //#elseif MC >= 11700
-        //$$ Lighting.setupForEntityInInventory();
+        //$$ com.mojang.blaze3d.platform.Lighting.setupForEntityInInventory();
         //#else
-        //$$ Lighting.setupForFlatItems();
+        //$$ com.mojang.blaze3d.platform.Lighting.setupForFlatItems();
         //#endif
     }
 
@@ -347,12 +351,18 @@ public class PaperDollRenderer {
         if (mc_instance.player.isFallFlying() || mc_instance.player.isAutoSpinAttack()) {
             ypos -= (90f + entity.xRotO) / 90f * (size) - 5;
         }
+        float extraRotation = 0;
+        if (entity instanceof Minecart) {
+            extraRotation += 90;
+        }
         prepareViewMatrix(xpos, ypos);
         PoseStack matrixStack = new PoseStack();
         matrixStack.translate(0.0D, 0.0D, 1000.0D);
         matrixStack.scale((float) size, (float) size, (float) size);
-        //#if MC >= 12005
-        int rot = 0;
+        //#if MC >= 12106
+        int rot = 180;
+        //#elseif MC >= 12005
+        //$$ int rot = 0;
         //#else
         //$$ int rot = 180;
         //#endif
@@ -367,7 +377,7 @@ public class PaperDollRenderer {
         Vec3 vel = entity.getDeltaMovement();
         Vec3 pos = entity.position();
         double yOld = entity.yOld;
-        EntityUtil.setYRot(entity, 0);
+        EntityUtil.setYRot(entity, rot + rotationSide * 20.0F + extraRotation);
         entity.yRotO = EntityUtil.getYRot(entity);
         entity.setDeltaMovement(Vec3.ZERO);
         //#if MC >= 11700
@@ -386,13 +396,18 @@ public class PaperDollRenderer {
         MultiBufferSource.BufferSource bufferSource = Minecraft.getInstance().renderBuffers().bufferSource();
         // Mc renders the player in the inventory without delta, causing it to look
         // "laggy". Good luck unseeing this :)
-        float extraRotation = 0;
-        if (entity instanceof Minecart) {
-            extraRotation += 90;
-        }
-        //#if MC >= 12102
-        entityRenderDispatcher.render(entity, 0.0D, 0.0D, 0.0D, rot + rotationSide * 20.0F + extraRotation, matrixStack,
-                bufferSource, 15728880);
+        //#if MC >= 12106
+        float o = 2;
+        var vector3f = new org.joml.Vector3f(0.0F, entity.getBbHeight() / 2.0F + 0 * o, 0.0F);
+        float p = (float) size / o;
+        ((dev.tr7zw.paperdoll.future.GameRendererAccessor) Minecraft.getInstance().gameRenderer).getGuiRenderState()
+                .submitPicturesInPictureState(new dev.tr7zw.paperdoll.future.CustomGuiEntityRenderState(
+                        entityRenderDispatcher.getRenderer(entity).createRenderState(entity, delta), matrixStack,
+                        vector3f, quaternion, quaternion2, (int) (xpos - size * 2 * o), (int) (ypos - size * 2 * o),
+                        (int) (xpos + size * 2 * o), (int) (ypos + size * 2 * o), p, xpos, ypos));
+        //#elseif MC >= 12102
+        //$$entityRenderDispatcher.render(entity, 0.0D, 0.0D, 0.0D, rot + rotationSide * 20.0F + extraRotation, matrixStack,
+        //$$        bufferSource, 15728880);
         //#else
         //$$entityRenderDispatcher.render(entity, 0.0D, 0.0D, 0.0D, rot + rotationSide * 20.0F + extraRotation, delta,
         //$$        matrixStack, bufferSource, 15728880);
