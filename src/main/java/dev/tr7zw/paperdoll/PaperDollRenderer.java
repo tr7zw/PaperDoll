@@ -62,10 +62,6 @@ public class PaperDollRenderer {
             break;
         }
         int size = 25 + instance.settings.dollSize;
-        //#if MC >= 12106
-        size += 26;
-        ypos -= 23;
-        //#endif
         int fSize = size;
         int fXpos = xpos;
         int fYpos = ypos;
@@ -99,11 +95,7 @@ public class PaperDollRenderer {
             getPassengersAndSelf(vehicle).forEachOrdered(entity -> {
                 double yOffset = fYpos;
                 if (entity != playerEntity)
-                    //#if MC >= 12106
-                    yOffset -= (playerEntity.getY() - entity.getY()) * fSize;
-                //#else
-                yOffset += (playerEntity.getY() - entity.getY()) * fSize;
-                //#endif
+                    yOffset += (playerEntity.getY() - entity.getY()) * fSize;
                 if (entity instanceof LivingEntity living) {
                     drawLivingEntity(fXpos, yOffset, fSize, lookSides, lookUpDown, living, delta, lockXHeadRot,
                             lockYHeadRot);
@@ -182,6 +174,20 @@ public class PaperDollRenderer {
         //#else
         //$$ int rot = 180;
         //#endif
+        double offsetX = 0;
+        double offsetY = 0;
+        double offsetZ = 0;
+        if (livingEntity.isPassenger()) {
+            Entity vehicle = livingEntity.getVehicle();
+            double offsetXTmp = livingEntity.getX() - vehicle.getX();
+            double offsetZTmp = livingEntity.getZ() - vehicle.getZ();
+            float rotation = EntityUtil.getYRot(vehicle) - rot - rotationSide * 20.0F; // target is 180
+            rotation *= MathUtil.DEG_TO_RAD;
+            rotation *= -1;
+            offsetX += Math.cos(rotation) * offsetXTmp - Math.sin(rotation) * offsetZTmp;
+            offsetZ += Math.sin(rotation) * offsetXTmp + Math.cos(rotation) * offsetZTmp;
+            // y offset is handeled above since the vehicle is moved down
+        }
         var quaternion = MathUtil.ZP.rotationDegrees(180.0F);
         var quaternion2 = MathUtil.XP.rotationDegrees(rotationUp * 20.0F);
         quaternion.mul(quaternion2);
@@ -240,25 +246,11 @@ public class PaperDollRenderer {
         entityRenderDispatcher.overrideCameraOrientation(quaternion2);
         entityRenderDispatcher.setRenderShadow(false);
         MultiBufferSource.BufferSource bufferSource = Minecraft.getInstance().renderBuffers().bufferSource();
-        double offsetX = 0;
-        double offsetY = 0;
-        double offsetZ = 0;
-        if (livingEntity.isPassenger()) {
-            Entity vehicle = livingEntity.getVehicle();
-            double offsetXTmp = livingEntity.getX() - vehicle.getX();
-            double offsetZTmp = livingEntity.getZ() - vehicle.getZ();
-            float rotation = EntityUtil.getYRot(vehicle) - rot - rotationSide * 20.0F; // target is 180
-            rotation *= MathUtil.DEG_TO_RAD;
-            rotation *= -1;
-            offsetX += Math.cos(rotation) * offsetXTmp - Math.sin(rotation) * offsetZTmp;
-            offsetZ += Math.sin(rotation) * offsetXTmp + Math.cos(rotation) * offsetZTmp;
-            // y offset is handeled above since the vehicle is moved down
-        }
         // Mc renders the player in the inventory without delta, causing it to look
         // "laggy". Good luck unseeing this :)
         //#if MC >= 12106
-        float o = 2;
-        var vector3f = new org.joml.Vector3f((float) offsetX, livingEntity.getBbHeight() / 2.0F + 0 * o,
+        float o = 1;
+        var vector3f = new org.joml.Vector3f((float) offsetX, 0,
                 (float) offsetZ);
         float p = (float) size / o;
         ((dev.tr7zw.paperdoll.future.GameRendererAccessor) Minecraft.getInstance().gameRenderer).getGuiRenderState()
@@ -397,7 +389,7 @@ public class PaperDollRenderer {
         // Mc renders the player in the inventory without delta, causing it to look
         // "laggy". Good luck unseeing this :)
         //#if MC >= 12106
-        float o = 2;
+        float o = 1;
         var vector3f = new org.joml.Vector3f(0.0F, entity.getBbHeight() / 2.0F + 0 * o, 0.0F);
         float p = (float) size / o;
         ((dev.tr7zw.paperdoll.future.GameRendererAccessor) Minecraft.getInstance().gameRenderer).getGuiRenderState()
