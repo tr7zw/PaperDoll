@@ -10,7 +10,7 @@
 
 <br>![Divider](https://tr7zw.github.io/uikit/divider_faded/Divider_04.png)
 
-<img src="https://tr7zw.github.io/uikit/headlines/large/About.png" alt="About" style="margin: 5px 10px;">
+<img src="https://tr7zw.github.io/uikit/headlines/large/About.png" alt="About" style="margin: 5px 10px;"><br>
 
 PaperDoll is a client-side mod that add a Bedrock style Paperdoll to the UI. It is highly customizable and can be used to enhance your gameplay experience by providing a more immersive view of your character.
 
