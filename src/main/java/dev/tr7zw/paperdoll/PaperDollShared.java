@@ -5,6 +5,7 @@ import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 
+import dev.tr7zw.transition.mc.*;
 import net.minecraft.client.KeyMapping;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -15,9 +16,10 @@ import com.google.gson.GsonBuilder;
 import dev.tr7zw.paperdoll.config.ConfigScreenProvider;
 import dev.tr7zw.transition.loader.ModLoaderEventUtil;
 import dev.tr7zw.transition.loader.ModLoaderUtil;
-//#if FORGE || NEOFORGE
-//$$ import dev.tr7zw.paperdoll.forge.PaperDollEvents;
-//#endif
+//? if forge || neoforge {
+
+// import dev.tr7zw.paperdoll.forge.PaperDollEvents;
+//? }
 
 public class PaperDollShared {
 
@@ -25,7 +27,7 @@ public class PaperDollShared {
     public static PaperDollShared instance;
     private final File settingsFile = new File("config", "paperdoll.json");
     private final Gson gson = new GsonBuilder().setPrettyPrinting().create();
-    private final KeyMapping toggleKeybind = new KeyMapping("key.paperdoll.toggle", -1,
+    private final KeyMapping toggleKeybind = GeneralUtil.createKeyMapping("key.paperdoll.toggle", -1,
             "text.paperdoll.keybinds.title");
     private boolean toggleKeybindPressed = false;
     public PaperDollSettings settings = new PaperDollSettings();
@@ -51,14 +53,17 @@ public class PaperDollShared {
             settings = new PaperDollSettings();
             writeSettings();
         }
-        //#if FORGE || NEOFORGE
-        //#if MC <= 12004 || NEOFORGE
-        //$$ ModLoaderUtil.registerForgeEvent(new PaperDollEvents()::onOverlay);
-        //#endif
-        //#if FORGE && MC >= 12105
-        //$$ //RenderGuiEvent.Post.EVENT.register(new PaperDollEvents()::onOverlay);
-        //#endif
-        //#endif
+        //? if forge || neoforge {
+
+        // //? if <= 1.20.4 || neoforge {
+
+        // // ModLoaderUtil.registerForgeEvent(new PaperDollEvents()::onOverlay);
+        // //? }
+        // //? if forge && >= 1.21.5 {
+
+        // // //RenderGuiEvent.Post.EVENT.register(new PaperDollEvents()::onOverlay);
+        // //? }
+        //? }
     }
 
     public void writeSettings() {

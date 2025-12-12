@@ -3,7 +3,8 @@ package dev.tr7zw.paperdoll.mixin;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
 
-//#if MC >= 12106
+//? if >= 1.21.6 {
+
 import dev.tr7zw.paperdoll.future.GameRendererAccessor;
 import lombok.Getter;
 import net.minecraft.client.gui.render.state.GuiRenderState;
@@ -17,9 +18,10 @@ public class GameRendererMixin implements GameRendererAccessor {
     private GuiRenderState guiRenderState;
 
 }
-//#else
-//$$@Mixin(net.minecraft.client.Minecraft.class)
-//$$public class GameRendererMixin {
-//$$    // This mixin is a placeholder for versions below 12106, as the custom GUI entity rendering is not supported.
-//$$}
-//#endif
+//? } else {
+
+// @Mixin(net.minecraft.client.Minecraft.class)
+// public class GameRendererMixin {
+//    // This mixin is a placeholder for versions below 12106, as the custom GUI entity rendering is not supported.
+// }
+//? }

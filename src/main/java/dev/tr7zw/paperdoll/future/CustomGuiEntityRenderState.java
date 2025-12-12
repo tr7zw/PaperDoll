@@ -1,4 +1,5 @@
-//#if MC >= 12106
+//? if >= 1.21.6 {
+
 package dev.tr7zw.paperdoll.future;
 
 import org.jetbrains.annotations.Nullable;
@@ -62,4 +63,4 @@ public record CustomGuiEntityRenderState(EntityRenderState renderState, PoseStac
         return PictureInPictureRenderState.getBounds(x0, y0, x1, y1, null);
     }
 }
-//#endif
+//? }

@@ -1,6 +1,8 @@
-//#if MC >= 12106
+//? if >= 1.21.6 {
+
 package dev.tr7zw.paperdoll.future;
 
+import net.minecraft.client.renderer.state.*;
 import org.joml.Quaternionf;
 import org.joml.Vector3f;
 
@@ -38,16 +40,28 @@ public class CustomGuiEntityRenderer extends PictureInPictureRenderer<CustomGuiE
         Vector3f vector3f = guiEntityRenderState.translation();
         poseStack.translate(vector3f.x, vector3f.y, vector3f.z);
         poseStack.mulPose(guiEntityRenderState.rotation());
+        //? if >= 1.21.10 {
         Quaternionf quaternionf = guiEntityRenderState.overrideCameraAngle();
+        guiEntityRenderState.renderState().shadowPieces.clear();
+        var featureRenderDispatcher = Minecraft.getInstance().gameRenderer.getFeatureRenderDispatcher();
+        CameraRenderState cameraRenderState = new CameraRenderState();
+        if (quaternionf != null) {
+            cameraRenderState.orientation = quaternionf.conjugate(new Quaternionf()).rotateY((float)Math.PI);
+        }
+
+        this.entityRenderDispatcher.submit(guiEntityRenderState.renderState(), cameraRenderState, (double)0.0F, (double)0.0F, (double)0.0F, poseStack, featureRenderDispatcher.getSubmitNodeStorage());
+        featureRenderDispatcher.renderAllFeatures();
+        //? } else {
+        /*Quaternionf quaternionf = guiEntityRenderState.overrideCameraAngle();
         if (quaternionf != null) {
             this.entityRenderDispatcher
                     .overrideCameraOrientation(quaternionf.conjugate(new Quaternionf()).rotateY((float) Math.PI));
         }
-
         this.entityRenderDispatcher.setRenderShadow(false);
         this.entityRenderDispatcher.render(guiEntityRenderState.renderState(), 0.0, 0.0, 0.0, poseStack,
                 this.bufferSource, 15728880);
         this.entityRenderDispatcher.setRenderShadow(true);
+        *///? }
     }
 
     @Override
@@ -74,4 +88,4 @@ public class CustomGuiEntityRenderer extends PictureInPictureRenderer<CustomGuiE
         return "customentity";
     }
 }
-//#endif
+//? }

@@ -17,7 +17,6 @@ import net.minecraft.client.renderer.entity.EntityRenderDispatcher;
 import net.minecraft.util.Mth;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.LivingEntity;
-import net.minecraft.world.entity.vehicle.Minecart;
 import net.minecraft.world.phys.Vec3;
 
 public class PaperDollRenderer {
@@ -29,13 +28,15 @@ public class PaperDollRenderer {
         Minecraft mc_instance = Minecraft.getInstance();
         if (!instance.settings.dollEnabled)
             return;
-        //#if MC >= 12002
+        //? if >= 1.20.2 {
+
         if (mc_instance.getDebugOverlay().showDebugScreen())
             return;
-        //#else
-        //$$ if (mc_instance.options.renderDebug)
-        //$$     return;
-        //#endif
+        //? } else {
+
+        // if (mc_instance.options.renderDebug)
+        //     return;
+        //? }
         if (mc_instance.level == null)
             return;
         if (mc_instance.options.hideGui)
@@ -83,9 +84,10 @@ public class PaperDollRenderer {
             return;
         }
 
-        //#if MC >= 12102
+        //? if >= 1.21.2 {
+
         Minecraft.getInstance().renderBuffers().bufferSource().endBatch();
-        //#endif
+        //? }
 
         boolean lockYHeadRot = instance.settings.dollHeadMode == DollHeadMode.LOCKED;
         boolean lockXHeadRot = lockYHeadRot || instance.settings.dollHeadMode == DollHeadMode.FREE_HORIZONTAL
@@ -140,10 +142,11 @@ public class PaperDollRenderer {
             return false;
         if (livingEntity.isOnFire() && !blacklist.contains(PaperDollSettings.AutoHideException.ON_FIRE))
             return false;
-        //#if MC >= 11700
+        //? if >= 1.17.0 {
+
         if (livingEntity.isInPowderSnow && !blacklist.contains(PaperDollSettings.AutoHideException.IN_POWDER_SNOW))
             return false;
-        //#endif
+        //? }
 
         return true;
     }
@@ -167,13 +170,16 @@ public class PaperDollRenderer {
         PoseStack matrixStack = new PoseStack();
         matrixStack.translate(0.0D, 0.0D, 1000.0D);
         matrixStack.scale((float) size, (float) size, (float) size);
-        //#if MC >= 12106
+        //? if >= 1.21.6 {
+
         int rot = 180;
-        //#elseif MC >= 12005
-        //$$ int rot = 0;
-        //#else
-        //$$ int rot = 180;
-        //#endif
+        //? } else if >= 1.20.5 {
+
+        // int rot = 0;
+        //? } else {
+
+        // int rot = 180;
+        //? }
         double offsetX = 0;
         double offsetY = 0;
         double offsetZ = 0;
@@ -243,30 +249,38 @@ public class PaperDollRenderer {
         prepareLighting();
         EntityRenderDispatcher entityRenderDispatcher = mc_instance.getEntityRenderDispatcher();
         MathUtil.conjugate(quaternion2);
+        //? if < 1.21.10 {
+        /*
         entityRenderDispatcher.overrideCameraOrientation(quaternion2);
         entityRenderDispatcher.setRenderShadow(false);
+        *///? }
         MultiBufferSource.BufferSource bufferSource = Minecraft.getInstance().renderBuffers().bufferSource();
         // Mc renders the player in the inventory without delta, causing it to look
         // "laggy". Good luck unseeing this :)
-        //#if MC >= 12106
+        //? if >= 1.21.6 {
+
         float o = 1;
-        var vector3f = new org.joml.Vector3f((float) offsetX, 0,
-                (float) offsetZ);
+        var vector3f = new org.joml.Vector3f((float) offsetX, 0, (float) offsetZ);
         float p = (float) size / o;
         ((dev.tr7zw.paperdoll.future.GameRendererAccessor) Minecraft.getInstance().gameRenderer).getGuiRenderState()
                 .submitPicturesInPictureState(new dev.tr7zw.paperdoll.future.CustomGuiEntityRenderState(
                         entityRenderDispatcher.getRenderer(livingEntity).createRenderState(livingEntity, delta),
                         matrixStack, vector3f, quaternion, quaternion2, (int) (xpos), (int) (ypos), (int) (xpos + size),
                         (int) (ypos + size), p, xpos, ypos));
-        //#elseif MC >= 12102
-        //$$entityRenderDispatcher.render(livingEntity, offsetX, offsetY, offsetZ, delta, matrixStack, bufferSource,
-        //$$        15728880);
-        //#else
-        //$$entityRenderDispatcher.render(livingEntity, offsetX, offsetY, offsetZ, 0.0F, delta, matrixStack, bufferSource,
-        //$$        15728880);
-        //#endif
+        //? } else if >= 1.21.2 {
+
+        // entityRenderDispatcher.render(livingEntity, offsetX, offsetY, offsetZ, delta, matrixStack, bufferSource,
+        //        15728880);
+        //? } else {
+
+        // entityRenderDispatcher.render(livingEntity, offsetX, offsetY, offsetZ, 0.0F, delta, matrixStack, bufferSource,
+        //        15728880);
+        //? }
         bufferSource.endBatch();
+        //? if < 1.21.10 {
+        /*
         entityRenderDispatcher.setRenderShadow(true);
+        *///? }
         if (livingEntity instanceof PlayerAccess player) {
             player.setLastDeletaMovement(lastDeltaMovement);
         }
@@ -291,48 +305,59 @@ public class PaperDollRenderer {
     }
 
     private void prepareViewMatrix(double xpos, double ypos) {
-        //#if MC >= 12005
+        //? if >= 1.20.5 {
+
         RenderSystem.getModelViewStack().pushMatrix();
         RenderSystem.getModelViewStack().translate((float) xpos, (float) ypos, 1050.0F);
         RenderSystem.getModelViewStack().scale(-1.0F, 1.0F, 1.0F);
-        //#if MC < 12102
-        //$$RenderSystem.applyModelViewMatrix();
-        //#endif
-        //#elseif MC >= 11700
-        //$$ PoseStack poseStack = RenderSystem.getModelViewStack();
-        //$$ poseStack.pushPose();
-        //$$ poseStack.translate(xpos, ypos, 1050.0D);
-        //$$ poseStack.scale(1.0F, 1.0F, -1.0F);
-        //$$ RenderSystem.applyModelViewMatrix();
-        //#else
-        //$$ RenderSystem.pushMatrix();
-        //$$ RenderSystem.translatef((float)xpos, (float)ypos, 1050.0F);
-        //$$ RenderSystem.scalef(1.0F, 1.0F, -1.0F);
-        //#endif
+        //? if < 1.21.2 {
+
+        // RenderSystem.applyModelViewMatrix();
+        //? }
+        //? } else if >= 1.17.0 {
+
+        // PoseStack poseStack = RenderSystem.getModelViewStack();
+        // poseStack.pushPose();
+        // poseStack.translate(xpos, ypos, 1050.0D);
+        // poseStack.scale(1.0F, 1.0F, -1.0F);
+        // RenderSystem.applyModelViewMatrix();
+        //? } else {
+
+        // RenderSystem.pushMatrix();
+        // RenderSystem.translatef((float)xpos, (float)ypos, 1050.0F);
+        // RenderSystem.scalef(1.0F, 1.0F, -1.0F);
+        //? }
     }
 
     private void resetViewMatrix() {
-        //#if MC >= 12005
+        //? if >= 1.20.5 {
+
         RenderSystem.getModelViewStack().popMatrix();
-        //#if MC < 12102
-        //$$RenderSystem.applyModelViewMatrix();
-        //#endif
-        //#elseif MC >= 11700
-        //$$ RenderSystem.getModelViewStack().popPose();
-        //$$ RenderSystem.applyModelViewMatrix();
-        //#else
-        //$$ RenderSystem.popMatrix();
-        //#endif
+        //? if < 1.21.2 {
+
+        // RenderSystem.applyModelViewMatrix();
+        //? }
+        //? } else if >= 1.17.0 {
+
+        // RenderSystem.getModelViewStack().popPose();
+        // RenderSystem.applyModelViewMatrix();
+        //? } else {
+
+        // RenderSystem.popMatrix();
+        //? }
     }
 
     private void prepareLighting() {
-        //#if MC >= 12106
+        //? if >= 1.21.6 {
+
         LightingUtil.prepareLightingEntity();
-        //#elseif MC >= 11700
-        //$$ com.mojang.blaze3d.platform.Lighting.setupForEntityInInventory();
-        //#else
-        //$$ com.mojang.blaze3d.platform.Lighting.setupForFlatItems();
-        //#endif
+        //? } else if >= 1.17.0 {
+
+        // com.mojang.blaze3d.platform.Lighting.setupForEntityInInventory();
+        //? } else {
+
+        // com.mojang.blaze3d.platform.Lighting.setupForFlatItems();
+        //? }
     }
 
     private void drawEntity(double xpos, double ypos, int size, float lookSides, float lookUpDown, Entity entity,
@@ -344,20 +369,31 @@ public class PaperDollRenderer {
             ypos -= (90f + entity.xRotO) / 90f * (size) - 5;
         }
         float extraRotation = 0;
-        if (entity instanceof Minecart) {
+        //? if >= 1.21.11 {
+        if (entity instanceof net.minecraft.world.entity.vehicle.minecart.Minecart) {
             extraRotation += 90;
         }
+        //? } else {
+        /*
+        if (entity instanceof net.minecraft.world.entity.vehicle.Minecart) {
+            extraRotation += 90;
+        }
+        *///? }
+
         prepareViewMatrix(xpos, ypos);
         PoseStack matrixStack = new PoseStack();
         matrixStack.translate(0.0D, 0.0D, 1000.0D);
         matrixStack.scale((float) size, (float) size, (float) size);
-        //#if MC >= 12106
+        //? if >= 1.21.6 {
+
         int rot = 180;
-        //#elseif MC >= 12005
-        //$$ int rot = 0;
-        //#else
-        //$$ int rot = 180;
-        //#endif
+        //? } else if >= 1.20.5 {
+
+        // int rot = 0;
+        //? } else {
+
+        // int rot = 180;
+        //? }
         var quaternion = MathUtil.ZP.rotationDegrees(180.0F);
         var quaternion2 = MathUtil.XP.rotationDegrees(rotationUp * 20.0F);
         quaternion.mul(quaternion2);
@@ -372,9 +408,10 @@ public class PaperDollRenderer {
         EntityUtil.setYRot(entity, rot + rotationSide * 20.0F + extraRotation);
         entity.yRotO = EntityUtil.getYRot(entity);
         entity.setDeltaMovement(Vec3.ZERO);
-        //#if MC >= 11700
+        //? if >= 1.17.0 {
+
         entity.setPos(pos.add(0, 500, 0)); // hack to disconnect minecarts from rails for the rendering
-        //#endif
+        //? }
         entity.yOld += 500;
         if (lockHead) {
             EntityUtil.setXRot(entity, -rotationUp * 20.0F);
@@ -383,12 +420,16 @@ public class PaperDollRenderer {
         prepareLighting();
         EntityRenderDispatcher entityRenderDispatcher = mc_instance.getEntityRenderDispatcher();
         MathUtil.conjugate(quaternion2);
+        //? if < 1.21.10 {
+        /*
         entityRenderDispatcher.overrideCameraOrientation(quaternion2);
         entityRenderDispatcher.setRenderShadow(false);
+        *///? }
         MultiBufferSource.BufferSource bufferSource = Minecraft.getInstance().renderBuffers().bufferSource();
         // Mc renders the player in the inventory without delta, causing it to look
         // "laggy". Good luck unseeing this :)
-        //#if MC >= 12106
+        //? if >= 1.21.6 {
+
         float o = 1;
         var vector3f = new org.joml.Vector3f(0.0F, entity.getBbHeight() / 2.0F + 0 * o, 0.0F);
         float p = (float) size / o;
@@ -397,23 +438,29 @@ public class PaperDollRenderer {
                         entityRenderDispatcher.getRenderer(entity).createRenderState(entity, delta), matrixStack,
                         vector3f, quaternion, quaternion2, (int) (xpos - size * 2 * o), (int) (ypos - size * 2 * o),
                         (int) (xpos + size * 2 * o), (int) (ypos + size * 2 * o), p, xpos, ypos));
-        //#elseif MC >= 12102
-        //$$entityRenderDispatcher.render(entity, 0.0D, 0.0D, 0.0D, rot + rotationSide * 20.0F + extraRotation, matrixStack,
-        //$$        bufferSource, 15728880);
-        //#else
-        //$$entityRenderDispatcher.render(entity, 0.0D, 0.0D, 0.0D, rot + rotationSide * 20.0F + extraRotation, delta,
-        //$$        matrixStack, bufferSource, 15728880);
-        //#endif
+        //? } else if >= 1.21.2 {
+
+        // entityRenderDispatcher.render(entity, 0.0D, 0.0D, 0.0D, rot + rotationSide * 20.0F + extraRotation, matrixStack,
+        //        bufferSource, 15728880);
+        //? } else {
+
+        // entityRenderDispatcher.render(entity, 0.0D, 0.0D, 0.0D, rot + rotationSide * 20.0F + extraRotation, delta,
+        //        matrixStack, bufferSource, 15728880);
+        //? }
         bufferSource.endBatch();
+        //? if < 1.21.10 {
+        /*
         entityRenderDispatcher.setRenderShadow(true);
+        *///? }
         EntityUtil.setYRot(entity, yRot);
         entity.yRotO = yRotO;
         EntityUtil.setXRot(entity, xRot);
         entity.xRotO = xRotO;
         entity.setDeltaMovement(vel);
-        //#if MC >= 11700
+        //? if >= 1.17.0 {
+
         entity.setPos(pos);
-        //#endif
+        //? }
         entity.yOld = yOld;
         resetViewMatrix();
     }

@@ -81,11 +81,12 @@ public class ConfigScreenProvider {
 
             autoHideOptions.add(getSplitLine("text.paperdoll.category.auto_hide_exceptions"));
             for (PaperDollSettings.AutoHideException condition : PaperDollSettings.AutoHideException.values()) {
-                //#if MC < 11700
-                //$$ if (condition == PaperDollSettings.AutoHideException.IN_POWDER_SNOW) {
-                //$$     continue;
-                //$$ }
-                //#endif
+                //? if < 1.17.0 {
+
+                // if (condition == PaperDollSettings.AutoHideException.IN_POWDER_SNOW) {
+                //     continue;
+                // }
+                //? }
                 autoHideOptions
                         .add(getOnOffOption("text.paperdoll.auto_hide." + condition.name().toLowerCase(Locale.US),
                                 () -> !inst.settings.autoHideBlacklist.contains(condition), (b) -> {

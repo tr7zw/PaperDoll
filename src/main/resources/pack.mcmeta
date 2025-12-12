@@ -1,6 +1,8 @@
 {
   "pack": {
     "description": "Resources for ${mod_id}",
-    "pack_format": ${pack_format_number}
+    "pack_format": ${pack_format_number},
+    "min_format": ${pack_format_number},
+    "max_format": ${pack_format_number}
   }
 }
