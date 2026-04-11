@@ -27,12 +27,12 @@
 // //? if >= 1.21.0 {
 
 // //    public void onOverlay(RenderGuiEvent.Post e) {
-// //            PaperDollShared.instance.renderer.render(e.getPartialTick().getGameTimeDeltaPartialTick(false));
+// //            PaperDollShared.instance.renderer.render(e.getPartialTick().getGameTimeDeltaPartialTick(false), null);
 // //    }
 // //? } else {
 
 // //    public void onOverlay(RenderGuiEvent.Post e) {
-// //            PaperDollShared.instance.renderer.render(e.getPartialTick());
+// //            PaperDollShared.instance.renderer.render(e.getPartialTick(), null);
 // //    }
 // //? }
 // //? } else {
@@ -42,13 +42,13 @@
 // //? } else if >= 1.19.0 {
 
 // //    public void onOverlay(RenderGuiEvent.Post e) {
-// //    	PaperDollShared.instance.renderer.render(e.getPartialTick());
+// //    	PaperDollShared.instance.renderer.render(e.getPartialTick(), null);
 // //    }
 // //? } else {
 
 // //    public void onOverlay(RenderGameOverlayEvent.Post e) {
 // //        if(e.getType() != ElementType.ALL)return;
-// //        PaperDollShared.instance.renderer.render(e.getPartialTicks());
+// //        PaperDollShared.instance.renderer.render(e.getPartialTicks(), null);
 // //    }
 // //? }
 // //? }

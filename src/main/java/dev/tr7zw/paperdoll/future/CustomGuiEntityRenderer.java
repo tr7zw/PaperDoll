@@ -1,6 +1,5 @@
-//? if >= 1.21.6 {
-
-package dev.tr7zw.paperdoll.future;
+//? if >= 1.21.6 && < 26.1 {
+/*package dev.tr7zw.paperdoll.future;
 
 import net.minecraft.client.renderer.state.*;
 import org.joml.Quaternionf;
@@ -46,13 +45,14 @@ public class CustomGuiEntityRenderer extends PictureInPictureRenderer<CustomGuiE
         var featureRenderDispatcher = Minecraft.getInstance().gameRenderer.getFeatureRenderDispatcher();
         CameraRenderState cameraRenderState = new CameraRenderState();
         if (quaternionf != null) {
-            cameraRenderState.orientation = quaternionf.conjugate(new Quaternionf()).rotateY((float)Math.PI);
+            cameraRenderState.orientation = quaternionf.conjugate(new Quaternionf()).rotateY((float) Math.PI);
         }
 
-        this.entityRenderDispatcher.submit(guiEntityRenderState.renderState(), cameraRenderState, (double)0.0F, (double)0.0F, (double)0.0F, poseStack, featureRenderDispatcher.getSubmitNodeStorage());
+        this.entityRenderDispatcher.submit(guiEntityRenderState.renderState(), cameraRenderState, (double) 0.0F,
+                (double) 0.0F, (double) 0.0F, poseStack, featureRenderDispatcher.getSubmitNodeStorage());
         featureRenderDispatcher.renderAllFeatures();
         //? } else {
-        /*Quaternionf quaternionf = guiEntityRenderState.overrideCameraAngle();
+        /^Quaternionf quaternionf = guiEntityRenderState.overrideCameraAngle();
         if (quaternionf != null) {
             this.entityRenderDispatcher
                     .overrideCameraOrientation(quaternionf.conjugate(new Quaternionf()).rotateY((float) Math.PI));
@@ -61,7 +61,7 @@ public class CustomGuiEntityRenderer extends PictureInPictureRenderer<CustomGuiE
         this.entityRenderDispatcher.render(guiEntityRenderState.renderState(), 0.0, 0.0, 0.0, poseStack,
                 this.bufferSource, 15728880);
         this.entityRenderDispatcher.setRenderShadow(true);
-        *///? }
+        ^///? }
     }
 
     @Override
@@ -88,4 +88,4 @@ public class CustomGuiEntityRenderer extends PictureInPictureRenderer<CustomGuiE
         return "customentity";
     }
 }
-//? }
+*///? }

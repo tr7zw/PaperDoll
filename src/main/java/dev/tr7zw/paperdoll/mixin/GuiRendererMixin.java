@@ -5,14 +5,14 @@ import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.ModifyVariable;
 
 import com.google.common.collect.ImmutableMap;
-//? if >= 1.21.6 {
+//? if >= 1.21.6 && < 26.1 {
 
-import dev.tr7zw.paperdoll.future.CustomGuiEntityRenderState;
+/*import dev.tr7zw.paperdoll.future.CustomGuiEntityRenderState;
 import dev.tr7zw.paperdoll.future.CustomGuiEntityRenderer;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.render.GuiRenderer;
 import net.minecraft.client.gui.render.pip.PictureInPictureRenderer;
-import net.minecraft.client.gui.render.state.pip.PictureInPictureRenderState;
+import net.minecraft.client.renderer.state.gui.pip.PictureInPictureRenderState;
 
 @Mixin(GuiRenderer.class)
 public class GuiRendererMixin {
@@ -27,10 +27,10 @@ public class GuiRendererMixin {
     }
 
 }
-//? } else {
+*///? } else {
 
-// @Mixin(net.minecraft.client.Minecraft.class)
-// public class GuiRendererMixin {
-//    // This mixin is a placeholder for versions below 12106, as the custom GUI entity rendering is not supported.
-// }
+@Mixin(net.minecraft.client.Minecraft.class)
+public class GuiRendererMixin {
+    // This mixin is a placeholder for versions below 12106, as the custom GUI entity rendering is not supported.
+}
 //? }

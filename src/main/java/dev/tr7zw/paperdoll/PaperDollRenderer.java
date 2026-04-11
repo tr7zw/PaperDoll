@@ -1,7 +1,7 @@
 package dev.tr7zw.paperdoll;
 
 import java.util.Set;
-import java.util.stream.Stream;
+import java.util.stream.*;
 
 import com.mojang.blaze3d.systems.RenderSystem;
 import com.mojang.blaze3d.vertex.PoseStack;
@@ -10,8 +10,10 @@ import dev.tr7zw.paperdoll.PaperDollSettings.DollHeadMode;
 import dev.tr7zw.transition.mc.EntityUtil;
 import dev.tr7zw.transition.mc.LightingUtil;
 import dev.tr7zw.transition.mc.MathUtil;
+import dev.tr7zw.trender.gui.client.*;
 import net.minecraft.client.CameraType;
 import net.minecraft.client.Minecraft;
+import net.minecraft.client.gui.screens.inventory.*;
 import net.minecraft.client.renderer.MultiBufferSource;
 import net.minecraft.client.renderer.entity.EntityRenderDispatcher;
 import net.minecraft.util.Mth;
@@ -24,7 +26,7 @@ public class PaperDollRenderer {
     private final PaperDollShared instance = PaperDollShared.instance;
     private long showTill = 0;
 
-    public void render(float delta) {
+    public void render(float delta, RenderContext context) {
         Minecraft mc_instance = Minecraft.getInstance();
         if (!instance.settings.dollEnabled)
             return;
@@ -62,6 +64,11 @@ public class PaperDollRenderer {
             ypos = mc_instance.getWindow().getGuiScaledHeight() - (55 + instance.settings.dollYOffset);
             break;
         }
+        // FIXME: Workaround for 26.1 new renderlogic having different positioning
+        //? if >= 26.1 {
+        xpos -= 50;
+        ypos -= 50;
+        //? }
         int size = 25 + instance.settings.dollSize;
         int fSize = size;
         int fXpos = xpos;
@@ -94,26 +101,35 @@ public class PaperDollRenderer {
                 || instance.settings.dollHeadMode == DollHeadMode.STATIC_HORIZONTAL;
         if (!instance.settings.hideVehicle && playerEntity.isPassenger()) {
             Entity vehicle = playerEntity.getRootVehicle();
-            getPassengersAndSelf(vehicle).forEachOrdered(entity -> {
+            var stream = getPassengersAndSelf(vehicle);
+            //? if >= 26.1 {
+            if (!(vehicle instanceof LivingEntity)) {
+                stream = reverse(stream);
+            }
+            //? }
+            stream.forEachOrdered(entity -> {
                 double yOffset = fYpos;
                 if (entity != playerEntity)
                     yOffset += (playerEntity.getY() - entity.getY()) * fSize;
                 if (entity instanceof LivingEntity living) {
-                    drawLivingEntity(fXpos, yOffset, fSize, lookSides, lookUpDown, living, delta, lockXHeadRot,
+                    drawEntity(context, fXpos, yOffset, fSize, lookSides, lookUpDown, living, delta, lockXHeadRot,
                             lockYHeadRot);
                 } else {
                     // yOffset -= 10;
-                    drawEntity(fXpos, yOffset, fSize, lookSides, lookUpDown, entity, delta, lockYHeadRot);
+                    drawEntity(context, fXpos, yOffset, fSize, lookSides, lookUpDown, entity, delta, lockYHeadRot,
+                            lockYHeadRot);
                 }
             });
         } else {
-            if (playerEntity instanceof LivingEntity living) {
-                drawLivingEntity(fXpos, fYpos, size, lookSides, lookUpDown, living, delta, lockXHeadRot, lockYHeadRot);
-            } else {
-                drawEntity(fXpos, fYpos, size, lookSides, lookUpDown, playerEntity, delta, lockYHeadRot);
-            }
+            drawEntity(context, fXpos, fYpos, size, lookSides, lookUpDown, playerEntity, delta, lockYHeadRot,
+                    lockYHeadRot);
         }
 
+    }
+
+    static <T> Stream<T> reverse(Stream<T> input) {
+        Object[] temp = input.toArray();
+        return (Stream<T>) IntStream.range(0, temp.length).mapToObj(i -> temp[temp.length - i - 1]);
     }
 
     private boolean shouldAutoHide(LivingEntity livingEntity) {
@@ -156,12 +172,13 @@ public class PaperDollRenderer {
     }
 
     // Modified version from InventoryScreen
-    private void drawLivingEntity(double xpos, double ypos, int size, float lookSides, float lookUpDown,
-            LivingEntity livingEntity, float delta, boolean lockHeadXRot, boolean lockHeadYRot) {
+    private void drawEntity(RenderContext context, double xpos, double ypos, int size, float lookSides,
+            float lookUpDown, Entity entity, float delta, boolean lockHeadXRot, boolean lockHeadYRot) {
         Minecraft mc_instance = Minecraft.getInstance();
         float rotationSide = (float) Math.atan((double) (lookSides / 40.0F));
         float rotationUp = (float) Math.atan((double) (lookUpDown / 40.0F));
-        if (livingEntity.isFallFlying() || livingEntity.isAutoSpinAttack()) {
+        if (entity instanceof LivingEntity livingEntity
+                && (livingEntity.isFallFlying() || livingEntity.isAutoSpinAttack())) {
             float f2 = (float) livingEntity.getFallFlyingTicks() + delta;
             float f3 = Mth.clamp(f2 * f2 / 100.0F, 0.0F, 1.0F);
             ypos -= (90f + f3) / 90f * (size) - 5;
@@ -183,10 +200,10 @@ public class PaperDollRenderer {
         double offsetX = 0;
         double offsetY = 0;
         double offsetZ = 0;
-        if (livingEntity.isPassenger()) {
-            Entity vehicle = livingEntity.getVehicle();
-            double offsetXTmp = livingEntity.getX() - vehicle.getX();
-            double offsetZTmp = livingEntity.getZ() - vehicle.getZ();
+        if (entity.isPassenger()) {
+            Entity vehicle = entity.getVehicle();
+            double offsetXTmp = entity.getX() - vehicle.getX();
+            double offsetZTmp = entity.getZ() - vehicle.getZ();
             float rotation = EntityUtil.getYRot(vehicle) - rot - rotationSide * 20.0F; // target is 180
             rotation *= MathUtil.DEG_TO_RAD;
             rotation *= -1;
@@ -198,45 +215,56 @@ public class PaperDollRenderer {
         var quaternion2 = MathUtil.XP.rotationDegrees(rotationUp * 20.0F);
         quaternion.mul(quaternion2);
         matrixStack.mulPose(quaternion);
-        float yBodyRot = livingEntity.yBodyRot;
-        float yRot = EntityUtil.getYRot(livingEntity);
-        float yRotO = livingEntity.yRotO;
-        float yBodyRotO = livingEntity.yBodyRotO;
-        float xRot = EntityUtil.getXRot(livingEntity);
-        float xRotO = livingEntity.xRotO;
-        float yHeadRotO = livingEntity.yHeadRotO;
-        float yHeadRot = livingEntity.yHeadRot;
-        Vec3 deltaMovement = livingEntity.getDeltaMovement();
+        float yRot = EntityUtil.getYRot(entity);
+        float yRotO = entity.yRotO;
+        float xRot = EntityUtil.getXRot(entity);
+        float xRotO = entity.xRotO;
+        float yHeadRotO = 0;
+        float yHeadRot = 0;
+        float yBodyRotO = 0;
+        float yBodyRot = 0;
+        if (entity instanceof LivingEntity livingEntity) {
+            yHeadRotO = livingEntity.yHeadRotO;
+            yHeadRot = livingEntity.yHeadRot;
+            yBodyRotO = livingEntity.yBodyRotO;
+            yBodyRot = livingEntity.yBodyRot;
+        }
+        Vec3 deltaMovement = entity.getDeltaMovement();
         float vehicleYBodyRot = 0;
         float vehicleYBodyRotO = 0;
-        livingEntity.yBodyRot = rot + rotationSide * 20.0F;
-        EntityUtil.setYRot(livingEntity, rot + rotationSide * 40.0F);
-        livingEntity.yBodyRotO = livingEntity.yBodyRot;
-        livingEntity.yRotO = EntityUtil.getYRot(livingEntity);
+        EntityUtil.setYRot(entity, rot + rotationSide * 40.0F);
+        entity.yRotO = EntityUtil.getYRot(entity);
+        if (entity instanceof LivingEntity livingEntity) {
+            livingEntity.yBodyRot = rot + rotationSide * 20.0F;
+            livingEntity.yBodyRotO = livingEntity.yBodyRot;
+        }
         Vec3 lastDeltaMovement = null;
-        if (livingEntity instanceof PlayerAccess player) {
+        if (entity instanceof PlayerAccess player) {
             lastDeltaMovement = player.getLastDelataMovement();
             player.setLastDeletaMovement(Vec3.ZERO);
         }
-        if (livingEntity.isPassenger() && livingEntity.getVehicle() instanceof LivingEntity livingVehicle) {
+        if (entity.isPassenger() && entity.getVehicle() instanceof LivingEntity livingVehicle) {
             vehicleYBodyRot = livingVehicle.yBodyRot;
             vehicleYBodyRotO = livingVehicle.yBodyRotO;
-            livingVehicle.yBodyRot = livingEntity.yBodyRot;
-            livingVehicle.yBodyRotO = livingEntity.yBodyRotO;
+            if (entity instanceof LivingEntity livingEntity) {
+                livingVehicle.yBodyRot = livingEntity.yBodyRot;
+                livingVehicle.yBodyRotO = livingEntity.yBodyRotO;
+            }
         }
-        if (livingEntity.isFallFlying() || livingEntity.isAutoSpinAttack()) {
-            livingEntity.setDeltaMovement(Vec3.ZERO);
+        if (entity instanceof LivingEntity livingEntity
+                && (livingEntity.isFallFlying() || livingEntity.isAutoSpinAttack())) {
+            entity.setDeltaMovement(Vec3.ZERO);
             lockHeadXRot = (livingEntity.isFallFlying() && instance.settings.lockElytra)
                     || (livingEntity.isAutoSpinAttack() && instance.settings.lockSpinning);
         }
         if (lockHeadXRot) {
-            EntityUtil.setXRot(livingEntity, -rotationUp * 20.0F);
-            livingEntity.xRotO = EntityUtil.getXRot(livingEntity);
+            EntityUtil.setXRot(entity, -rotationUp * 20.0F);
+            entity.xRotO = EntityUtil.getXRot(entity);
         }
-        if (lockHeadYRot) {
-            livingEntity.yHeadRot = EntityUtil.getYRot(livingEntity);
-            livingEntity.yHeadRotO = EntityUtil.getYRot(livingEntity);
-        } else {
+        if (entity instanceof LivingEntity livingEntity && lockHeadYRot) {
+            livingEntity.yHeadRot = EntityUtil.getYRot(entity);
+            livingEntity.yHeadRotO = EntityUtil.getYRot(entity);
+        } else if (entity instanceof LivingEntity livingEntity) {
             if (instance.settings.dollHeadMode == DollHeadMode.FREE
                     || instance.settings.dollHeadMode == DollHeadMode.FREE_HORIZONTAL) {
                 livingEntity.yHeadRot = rot + rotationSide * 40.0F - (yBodyRot - yHeadRot);
@@ -257,23 +285,30 @@ public class PaperDollRenderer {
         MultiBufferSource.BufferSource bufferSource = Minecraft.getInstance().renderBuffers().bufferSource();
         // Mc renders the player in the inventory without delta, causing it to look
         // "laggy". Good luck unseeing this :)
-        //? if >= 1.21.6 {
+        //? if >= 26.1 {
 
-        float o = 1;
+        var vector3f = new org.joml.Vector3f((float) offsetX, 0, (float) offsetZ);
+        var state = entityRenderDispatcher.getRenderer(entity).createRenderState(entity, delta);
+        state.shadowPieces.clear();
+        context.getGuiGraphics().entity(state, (float) size, vector3f, quaternion, quaternion2, (int) (xpos),
+                (int) (ypos), (int) (xpos + (size * 4)), (int) (ypos + (size * 4))); // TODO: Magic numbers
+        //? } else if >= 1.21.6 {
+
+        /*float o = 1;
         var vector3f = new org.joml.Vector3f((float) offsetX, 0, (float) offsetZ);
         float p = (float) size / o;
         ((dev.tr7zw.paperdoll.future.GameRendererAccessor) Minecraft.getInstance().gameRenderer).getGuiRenderState()
                 .submitPicturesInPictureState(new dev.tr7zw.paperdoll.future.CustomGuiEntityRenderState(
-                        entityRenderDispatcher.getRenderer(livingEntity).createRenderState(livingEntity, delta),
-                        matrixStack, vector3f, quaternion, quaternion2, (int) (xpos), (int) (ypos), (int) (xpos + size),
+                        entityRenderDispatcher.getRenderer(entity).createRenderState(entity, delta), matrixStack,
+                        vector3f, quaternion, quaternion2, (int) (xpos), (int) (ypos), (int) (xpos + size),
                         (int) (ypos + size), p, xpos, ypos));
-        //? } else if >= 1.21.2 {
+        *///? } else if >= 1.21.2 {
 
-        // entityRenderDispatcher.render(livingEntity, offsetX, offsetY, offsetZ, delta, matrixStack, bufferSource,
+        // entityRenderDispatcher.render(entity, offsetX, offsetY, offsetZ, delta, matrixStack, bufferSource,
         //        15728880);
         //? } else {
 
-        // entityRenderDispatcher.render(livingEntity, offsetX, offsetY, offsetZ, 0.0F, delta, matrixStack, bufferSource,
+        // entityRenderDispatcher.render(entity, offsetX, offsetY, offsetZ, 0.0F, delta, matrixStack, bufferSource,
         //        15728880);
         //? }
         bufferSource.endBatch();
@@ -281,19 +316,21 @@ public class PaperDollRenderer {
         /*
         entityRenderDispatcher.setRenderShadow(true);
         *///? }
-        if (livingEntity instanceof PlayerAccess player) {
+        if (entity instanceof PlayerAccess player) {
             player.setLastDeletaMovement(lastDeltaMovement);
         }
-        livingEntity.yBodyRot = yBodyRot;
-        livingEntity.yBodyRotO = yBodyRotO;
-        EntityUtil.setYRot(livingEntity, yRot);
-        livingEntity.yRotO = yRotO;
-        EntityUtil.setXRot(livingEntity, xRot);
-        livingEntity.xRotO = xRotO;
-        livingEntity.yHeadRotO = yHeadRotO;
-        livingEntity.yHeadRot = yHeadRot;
-        livingEntity.setDeltaMovement(deltaMovement);
-        if (livingEntity.isPassenger() && livingEntity.getVehicle() instanceof LivingEntity livingVehicle) {
+        if (entity instanceof LivingEntity livingEntity) {
+            livingEntity.yBodyRot = yBodyRot;
+            livingEntity.yBodyRotO = yBodyRotO;
+            livingEntity.yHeadRotO = yHeadRotO;
+            livingEntity.yHeadRot = yHeadRot;
+        }
+        EntityUtil.setYRot(entity, yRot);
+        entity.yRotO = yRotO;
+        EntityUtil.setXRot(entity, xRot);
+        entity.xRotO = xRotO;
+        entity.setDeltaMovement(deltaMovement);
+        if (entity.isPassenger() && entity.getVehicle() instanceof LivingEntity livingVehicle) {
             livingVehicle.yBodyRot = vehicleYBodyRot;
             livingVehicle.yBodyRotO = vehicleYBodyRotO;
         }
@@ -358,111 +395,6 @@ public class PaperDollRenderer {
 
         // com.mojang.blaze3d.platform.Lighting.setupForFlatItems();
         //? }
-    }
-
-    private void drawEntity(double xpos, double ypos, int size, float lookSides, float lookUpDown, Entity entity,
-            float delta, boolean lockHead) {
-        Minecraft mc_instance = Minecraft.getInstance();
-        float rotationSide = (float) Math.atan((double) (lookSides / 40.0F));
-        float rotationUp = (float) Math.atan((double) (lookUpDown / 40.0F));
-        if (mc_instance.player.isFallFlying() || mc_instance.player.isAutoSpinAttack()) {
-            ypos -= (90f + entity.xRotO) / 90f * (size) - 5;
-        }
-        float extraRotation = 0;
-        //? if >= 1.21.11 {
-        if (entity instanceof net.minecraft.world.entity.vehicle.minecart.Minecart) {
-            extraRotation += 90;
-        }
-        //? } else {
-        /*
-        if (entity instanceof net.minecraft.world.entity.vehicle.Minecart) {
-            extraRotation += 90;
-        }
-        *///? }
-
-        prepareViewMatrix(xpos, ypos);
-        PoseStack matrixStack = new PoseStack();
-        matrixStack.translate(0.0D, 0.0D, 1000.0D);
-        matrixStack.scale((float) size, (float) size, (float) size);
-        //? if >= 1.21.6 {
-
-        int rot = 180;
-        //? } else if >= 1.20.5 {
-
-        // int rot = 0;
-        //? } else {
-
-        // int rot = 180;
-        //? }
-        var quaternion = MathUtil.ZP.rotationDegrees(180.0F);
-        var quaternion2 = MathUtil.XP.rotationDegrees(rotationUp * 20.0F);
-        quaternion.mul(quaternion2);
-        matrixStack.mulPose(quaternion);
-        float yRot = EntityUtil.getYRot(entity);
-        float yRotO = entity.yRotO;
-        float xRot = EntityUtil.getXRot(entity);
-        float xRotO = entity.xRotO;
-        Vec3 vel = entity.getDeltaMovement();
-        Vec3 pos = entity.position();
-        double yOld = entity.yOld;
-        EntityUtil.setYRot(entity, rot + rotationSide * 20.0F + extraRotation);
-        entity.yRotO = EntityUtil.getYRot(entity);
-        entity.setDeltaMovement(Vec3.ZERO);
-        //? if >= 1.17.0 {
-
-        entity.setPos(pos.add(0, 500, 0)); // hack to disconnect minecarts from rails for the rendering
-        //? }
-        entity.yOld += 500;
-        if (lockHead) {
-            EntityUtil.setXRot(entity, -rotationUp * 20.0F);
-            entity.xRotO = EntityUtil.getXRot(entity);
-        }
-        prepareLighting();
-        EntityRenderDispatcher entityRenderDispatcher = mc_instance.getEntityRenderDispatcher();
-        MathUtil.conjugate(quaternion2);
-        //? if < 1.21.10 {
-        /*
-        entityRenderDispatcher.overrideCameraOrientation(quaternion2);
-        entityRenderDispatcher.setRenderShadow(false);
-        *///? }
-        MultiBufferSource.BufferSource bufferSource = Minecraft.getInstance().renderBuffers().bufferSource();
-        // Mc renders the player in the inventory without delta, causing it to look
-        // "laggy". Good luck unseeing this :)
-        //? if >= 1.21.6 {
-
-        float o = 1;
-        var vector3f = new org.joml.Vector3f(0.0F, entity.getBbHeight() / 2.0F + 0 * o, 0.0F);
-        float p = (float) size / o;
-        ((dev.tr7zw.paperdoll.future.GameRendererAccessor) Minecraft.getInstance().gameRenderer).getGuiRenderState()
-                .submitPicturesInPictureState(new dev.tr7zw.paperdoll.future.CustomGuiEntityRenderState(
-                        entityRenderDispatcher.getRenderer(entity).createRenderState(entity, delta), matrixStack,
-                        vector3f, quaternion, quaternion2, (int) (xpos - size * 2 * o), (int) (ypos - size * 2 * o),
-                        (int) (xpos + size * 2 * o), (int) (ypos + size * 2 * o), p, xpos, ypos));
-        //? } else if >= 1.21.2 {
-
-        // entityRenderDispatcher.render(entity, 0.0D, 0.0D, 0.0D, rot + rotationSide * 20.0F + extraRotation, matrixStack,
-        //        bufferSource, 15728880);
-        //? } else {
-
-        // entityRenderDispatcher.render(entity, 0.0D, 0.0D, 0.0D, rot + rotationSide * 20.0F + extraRotation, delta,
-        //        matrixStack, bufferSource, 15728880);
-        //? }
-        bufferSource.endBatch();
-        //? if < 1.21.10 {
-        /*
-        entityRenderDispatcher.setRenderShadow(true);
-        *///? }
-        EntityUtil.setYRot(entity, yRot);
-        entity.yRotO = yRotO;
-        EntityUtil.setXRot(entity, xRot);
-        entity.xRotO = xRotO;
-        entity.setDeltaMovement(vel);
-        //? if >= 1.17.0 {
-
-        entity.setPos(pos);
-        //? }
-        entity.yOld = yOld;
-        resetViewMatrix();
     }
 
 }

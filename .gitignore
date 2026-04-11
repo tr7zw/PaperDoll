@@ -52,3 +52,4 @@ versions/1.18.2-fabric/src/main/java/dev/tr7zw/config/CustomConfigScreen.java
 versions/1.19.2-fabric/src/main/java/dev/tr7zw/config/CustomConfigScreen.java
 src/main/java/dev/tr7zw/config/CustomConfigScreen.java
 src/main/neoforge-resources/META-INF/neoforge.mods.toml
+pmd-rules.xml

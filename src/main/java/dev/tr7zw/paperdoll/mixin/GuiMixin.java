@@ -1,5 +1,6 @@
 package dev.tr7zw.paperdoll.mixin;
 
+import dev.tr7zw.trender.gui.client.*;
 import org.spongepowered.asm.mixin.Mixin;
 
 import org.spongepowered.asm.mixin.injection.At;
@@ -23,12 +24,21 @@ import net.minecraft.client.DeltaTracker;
 @Mixin(Gui.class)
 public class GuiMixin {
 
-    //? if >= 1.21.6 {
+    //? if >= 26.1 {
 
-    @Inject(at = @At("HEAD"), method = "render")
-    public void render(net.minecraft.client.gui.GuiGraphics guiGraphics, DeltaTracker deltaTracker, CallbackInfo ci) {
+    @Inject(at = @At("HEAD"), method = "extractHotbarAndDecorations")
+    public void render(net.minecraft.client.gui.GuiGraphicsExtractor guiGraphics, DeltaTracker deltaTracker,
+            CallbackInfo ci) {
         float delta = deltaTracker.getGameTimeDeltaPartialTick(true);
-        //? } else if >= 1.21.0 {
+        RenderContext context = new RenderContext(guiGraphics);
+        //? } else if >= 1.21.6 {
+        /*
+        @Inject(at = @At("HEAD"), method = "render")
+        public void render(net.minecraft.client.gui.GuiGraphicsExtractor guiGraphics, DeltaTracker deltaTracker,
+            CallbackInfo ci) {
+        float delta = deltaTracker.getGameTimeDeltaPartialTick(true);
+        RenderContext context = new RenderContext(guiGraphics);
+        *///? } else if >= 1.21.0 {
 
         // @Shadow
         // private LayeredDraw layers;
@@ -36,18 +46,21 @@ public class GuiMixin {
         // public void init(Minecraft minecraft, CallbackInfo ci) {
         // layers.add(new Layer() {
         // @Override
-        // public void render(net.minecraft.client.gui.GuiGraphics guiGraphics, DeltaTracker deltaTracker) {
+        // public void render(net.minecraft.client.gui.GuiGraphicsExtractor guiGraphics, DeltaTracker deltaTracker) {
         // float delta = deltaTracker.getGameTimeDeltaPartialTick(true);
+        // RenderContext context = new RenderContext(guiGraphics);
         //? } else if >= 1.20.0 {
 
         // @Inject(at = @At("HEAD"), method = "render")
-        // public void render(net.minecraft.client.gui.GuiGraphics guiGraphics, float delta, CallbackInfo info) {
+        // public void render(net.minecraft.client.gui.GuiGraphicsExtractor guiGraphics, float delta, CallbackInfo info) {
+        // RenderContext context = new RenderContext(guiGraphics);
         //? } else {
 
         // @Inject(at = @At("HEAD"), method = "render")
         // public void render(com.mojang.blaze3d.vertex.PoseStack poseStack, float delta, CallbackInfo info) {
+        // RenderContext context = null;
         //? }
-        PaperDollShared.instance.renderer.render(delta);
+        PaperDollShared.instance.renderer.render(delta, context);
         //spotless:off
         //? if >= 1.21.0 && < 1.21.6 {
 

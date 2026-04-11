@@ -13,7 +13,7 @@ public class PaperDollPreviewDummyWidget extends WWidget {
 
     @Override
     public void paint(RenderContext context, int x, int y, int mouseX, int mouseY) {
-        PaperDollShared.instance.renderer.render(0);
+        PaperDollShared.instance.renderer.render(0, context);
     }
 
 }

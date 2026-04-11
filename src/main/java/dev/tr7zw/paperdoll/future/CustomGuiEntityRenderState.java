@@ -1,6 +1,6 @@
-//? if >= 1.21.6 {
+//? if >= 1.21.6 && < 26.1 {
 
-package dev.tr7zw.paperdoll.future;
+/*package dev.tr7zw.paperdoll.future;
 
 import org.jetbrains.annotations.Nullable;
 import org.joml.Quaternionf;
@@ -63,4 +63,4 @@ public record CustomGuiEntityRenderState(EntityRenderState renderState, PoseStac
         return PictureInPictureRenderState.getBounds(x0, y0, x1, y1, null);
     }
 }
-//? }
+*///? }
