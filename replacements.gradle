@@ -1,0 +1,5 @@
+stonecutter {
+    replacements.string(current.parsed >= "26.0") {
+        replace("net.minecraft.client.gui.render.state.pip.PictureInPictureRenderState", "net.minecraft.client.renderer.state.gui.pip.PictureInPictureRenderState")
+    }
+}
