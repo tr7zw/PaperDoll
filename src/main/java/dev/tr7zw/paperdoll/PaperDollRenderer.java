@@ -14,7 +14,8 @@ import dev.tr7zw.trender.gui.client.*;
 import net.minecraft.client.CameraType;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.screens.inventory.*;
-import net.minecraft.client.renderer.MultiBufferSource;
+//? if < 26.2
+//import net.minecraft.client.renderer.MultiBufferSource;
 import net.minecraft.client.renderer.entity.EntityRenderDispatcher;
 import net.minecraft.util.Mth;
 import net.minecraft.world.entity.Entity;
@@ -41,8 +42,15 @@ public class PaperDollRenderer {
         //? }
         if (mc_instance.level == null)
             return;
+        //? if >= 26.2 {
+
+        if (mc_instance.gui.hud.isHidden())
+            return;
+        //? } else {
+        /*
         if (mc_instance.options.hideGui)
             return;
+        *///? }
 
         int xpos = 0;
         int ypos = 0;
@@ -91,10 +99,10 @@ public class PaperDollRenderer {
             return;
         }
 
-        //? if >= 1.21.2 {
-
+        //? if >= 1.21.2 && < 26.1 {
+        /*
         Minecraft.getInstance().renderBuffers().bufferSource().endBatch();
-        //? }
+        *///? }
 
         boolean lockYHeadRot = instance.settings.dollHeadMode == DollHeadMode.LOCKED;
         boolean lockXHeadRot = lockYHeadRot || instance.settings.dollHeadMode == DollHeadMode.FREE_HORIZONTAL
@@ -282,10 +290,13 @@ public class PaperDollRenderer {
         entityRenderDispatcher.overrideCameraOrientation(quaternion2);
         entityRenderDispatcher.setRenderShadow(false);
         *///? }
-        MultiBufferSource.BufferSource bufferSource = Minecraft.getInstance().renderBuffers().bufferSource();
-        // Mc renders the player in the inventory without delta, causing it to look
-        // "laggy". Good luck unseeing this :)
-        //? if >= 26.1 {
+           //? if < 26.2 {
+           /*
+           MultiBufferSource.BufferSource bufferSource = Minecraft.getInstance().renderBuffers().bufferSource();
+           *///? }
+           // Mc renders the player in the inventory without delta, causing it to look
+           // "laggy". Good luck unseeing this :)
+           //? if >= 26.1 {
 
         var vector3f = new org.joml.Vector3f((float) offsetX, 0, (float) offsetZ);
         var state = entityRenderDispatcher.getRenderer(entity).createRenderState(entity, delta);
@@ -311,11 +322,14 @@ public class PaperDollRenderer {
         // entityRenderDispatcher.render(entity, offsetX, offsetY, offsetZ, 0.0F, delta, matrixStack, bufferSource,
         //        15728880);
         //? }
-        bufferSource.endBatch();
-        //? if < 1.21.10 {
+        //? if < 26.2 {
         /*
-        entityRenderDispatcher.setRenderShadow(true);
+        bufferSource.endBatch();
         *///? }
+           //? if < 1.21.10 {
+           /*
+           entityRenderDispatcher.setRenderShadow(true);
+           *///? }
         if (entity instanceof PlayerAccess player) {
             player.setLastDeletaMovement(lastDeltaMovement);
         }

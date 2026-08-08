@@ -21,17 +21,30 @@ import net.minecraft.client.gui.Gui;
 import net.minecraft.client.DeltaTracker;
 //? }
 
+//? if >= 26.2 {
+
+@Mixin(net.minecraft.client.gui.Hud.class)
+//? } else {
+/*
 @Mixin(Gui.class)
+*///? }
 public class GuiMixin {
 
-    //? if >= 26.1 {
+    //? if >= 26.2 {
 
-    @Inject(at = @At("HEAD"), method = "extractHotbarAndDecorations")
+    @Inject(at = @At("HEAD"), method = "extractRenderState")
     public void render(net.minecraft.client.gui.GuiGraphicsExtractor guiGraphics, DeltaTracker deltaTracker,
             CallbackInfo ci) {
         float delta = deltaTracker.getGameTimeDeltaPartialTick(true);
         RenderContext context = new RenderContext(guiGraphics);
-        //? } else if >= 1.21.6 {
+        //? } else if >= 26.1 {
+        /*
+        @Inject(at = @At("HEAD"), method = "extractHotbarAndDecorations")
+        public void render(net.minecraft.client.gui.GuiGraphicsExtractor guiGraphics, DeltaTracker deltaTracker,
+            CallbackInfo ci) {
+        float delta = deltaTracker.getGameTimeDeltaPartialTick(true);
+        RenderContext context = new RenderContext(guiGraphics);
+        *///? } else if >= 1.21.6 {
         /*
         @Inject(at = @At("HEAD"), method = "render")
         public void render(net.minecraft.client.gui.GuiGraphicsExtractor guiGraphics, DeltaTracker deltaTracker,

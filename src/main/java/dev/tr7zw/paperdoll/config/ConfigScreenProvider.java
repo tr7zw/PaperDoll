@@ -5,7 +5,7 @@ import java.util.List;
 import java.util.Locale;
 
 import dev.tr7zw.paperdoll.gui.widget.PaperDollPreviewDummyWidget;
-import dev.tr7zw.transition.mc.ComponentProvider;
+import dev.tr7zw.transition.mc.*;
 import dev.tr7zw.paperdoll.PaperDollSettings;
 import dev.tr7zw.paperdoll.PaperDollSettings.DollHeadMode;
 import dev.tr7zw.paperdoll.PaperDollSettings.PaperDollLocation;
@@ -109,7 +109,7 @@ public class ConfigScreenProvider {
             WButton doneButton = new WButton(CommonComponents.GUI_DONE);
             doneButton.setOnClick(() -> {
                 save();
-                Minecraft.getInstance().setScreen(previous);
+                GeneralUtil.setScreen(previous);
             });
             root.add(doneButton, 0, 27, 6, 2);
 
