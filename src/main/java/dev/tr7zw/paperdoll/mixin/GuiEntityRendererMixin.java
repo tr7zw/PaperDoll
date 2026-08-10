@@ -4,7 +4,7 @@ import org.spongepowered.asm.mixin.*;
 import org.spongepowered.asm.mixin.injection.*;
 import org.spongepowered.asm.mixin.injection.callback.*;
 //? if >= 26.1 {
-/*import com.mojang.blaze3d.vertex.*;
+import com.mojang.blaze3d.vertex.*;
 import dev.tr7zw.paperdoll.*;
 import dev.tr7zw.transition.mc.extending.*;
 import net.minecraft.client.gui.render.pip.*;
@@ -28,14 +28,14 @@ public class GuiEntityRendererMixin {
 
     @Inject(method = "renderToTexture", at = @At("TAIL"))
     //? if >= 26.2 {
-    /^protected void renderToTexture(final GuiEntityRenderState entityState, final PoseStack poseStack,
+    protected void renderToTexture(final GuiEntityRenderState entityState, final PoseStack poseStack,
             final SubmitNodeCollector submitNodeCollector, CallbackInfo ci) {
-        ^///? } else {
-        
-        protected void renderToTexture(final GuiEntityRenderState entityState, final PoseStack poseStack, CallbackInfo ci) {
+        //? } else {
+
+        /*protected void renderToTexture(final GuiEntityRenderState entityState, final PoseStack poseStack, CallbackInfo ci) {
         var featureRenderDispatcher = net.minecraft.client.Minecraft.getInstance().gameRenderer.getFeatureRenderDispatcher();
         var submitNodeCollector = featureRenderDispatcher.getSubmitNodeStorage();
-        //? }
+        *///? }
         if (entityState.renderState() instanceof ExtensionHolder holder) {
             List<EntityRenderState> renderStates = holder.getExtension("PaperDollVehicles", List.class);
             if (renderStates != null) {
@@ -53,18 +53,18 @@ public class GuiEntityRendererMixin {
                     poseStack.popPose();
                 }
                 //? if = 26.1 {
-                /^
+                /*
                 featureRenderDispatcher.renderAllFeatures();
-                ^///? }
+                *///? }
             }
         }
     }
 
 }
-*///? } else {
+//? } else {
 
-@Mixin(net.minecraft.client.Minecraft.class)
+/*@Mixin(net.minecraft.client.Minecraft.class)
 public class GuiEntityRendererMixin {
     // This mixin is a placeholder for versions below 26.1
 }
-//? }
+*///? }
