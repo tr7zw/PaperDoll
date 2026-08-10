@@ -7,7 +7,8 @@
         "GuiMixin",
         "AbstractClientPlayerMixin",
         "GuiRendererMixin",
-        "GameRendererMixin"
+        "GameRendererMixin",
+        "GuiEntityRendererMixin"
     ],
     "injectors": {
         "defaultRequire": 1

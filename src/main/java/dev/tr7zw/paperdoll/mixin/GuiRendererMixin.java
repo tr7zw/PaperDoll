@@ -12,7 +12,7 @@ import dev.tr7zw.paperdoll.future.CustomGuiEntityRenderer;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.render.GuiRenderer;
 import net.minecraft.client.gui.render.pip.PictureInPictureRenderer;
-import net.minecraft.client.renderer.state.gui.pip.PictureInPictureRenderState;
+import net.minecraft.client.gui.render.state.pip.PictureInPictureRenderState;
 
 @Mixin(GuiRenderer.class)
 public class GuiRendererMixin {

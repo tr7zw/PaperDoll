@@ -13,59 +13,59 @@ import net.minecraft.client.gui.Gui;
 
 //? if < 1.21.6 {
 
-// import net.minecraft.client.gui.LayeredDraw;
-// import net.minecraft.client.gui.LayeredDraw.Layer;
-// import org.spongepowered.asm.mixin.Shadow;
-// import net.minecraft.client.Minecraft;
+ import net.minecraft.client.gui.LayeredDraw;
+ import net.minecraft.client.gui.LayeredDraw.Layer;
+ import org.spongepowered.asm.mixin.Shadow;
+ import net.minecraft.client.Minecraft;
 //? }
 import net.minecraft.client.DeltaTracker;
 //? }
 
 //? if >= 26.2 {
 
-@Mixin(net.minecraft.client.gui.Hud.class)
-//? } else {
-/*
+/*@Mixin(net.minecraft.client.gui.Hud.class)
+*///? } else {
+
 @Mixin(Gui.class)
-*///? }
+//? }
 public class GuiMixin {
 
     //? if >= 26.2 {
 
-    @Inject(at = @At("HEAD"), method = "extractRenderState")
-    public void render(net.minecraft.client.gui.GuiGraphicsExtractor guiGraphics, DeltaTracker deltaTracker,
+    /*@Inject(at = @At("HEAD"), method = "extractRenderState")
+    public void render(net.minecraft.client.gui.GuiGraphics guiGraphics, DeltaTracker deltaTracker,
             CallbackInfo ci) {
         float delta = deltaTracker.getGameTimeDeltaPartialTick(true);
         RenderContext context = new RenderContext(guiGraphics);
-        //? } else if >= 26.1 {
+        *///? } else if >= 26.1 {
         /*
         @Inject(at = @At("HEAD"), method = "extractHotbarAndDecorations")
-        public void render(net.minecraft.client.gui.GuiGraphicsExtractor guiGraphics, DeltaTracker deltaTracker,
+        public void render(net.minecraft.client.gui.GuiGraphics guiGraphics, DeltaTracker deltaTracker,
             CallbackInfo ci) {
         float delta = deltaTracker.getGameTimeDeltaPartialTick(true);
         RenderContext context = new RenderContext(guiGraphics);
         *///? } else if >= 1.21.6 {
         /*
         @Inject(at = @At("HEAD"), method = "render")
-        public void render(net.minecraft.client.gui.GuiGraphicsExtractor guiGraphics, DeltaTracker deltaTracker,
+        public void render(net.minecraft.client.gui.GuiGraphics guiGraphics, DeltaTracker deltaTracker,
             CallbackInfo ci) {
         float delta = deltaTracker.getGameTimeDeltaPartialTick(true);
         RenderContext context = new RenderContext(guiGraphics);
         *///? } else if >= 1.21.0 {
 
-        // @Shadow
-        // private LayeredDraw layers;
-        // @Inject(method = "<init>", at = @At("RETURN"))
-        // public void init(Minecraft minecraft, CallbackInfo ci) {
-        // layers.add(new Layer() {
-        // @Override
-        // public void render(net.minecraft.client.gui.GuiGraphicsExtractor guiGraphics, DeltaTracker deltaTracker) {
-        // float delta = deltaTracker.getGameTimeDeltaPartialTick(true);
-        // RenderContext context = new RenderContext(guiGraphics);
+         @Shadow
+         private LayeredDraw layers;
+         @Inject(method = "<init>", at = @At("RETURN"))
+         public void init(Minecraft minecraft, CallbackInfo ci) {
+         layers.add(new Layer() {
+         @Override
+         public void render(net.minecraft.client.gui.GuiGraphics guiGraphics, DeltaTracker deltaTracker) {
+         float delta = deltaTracker.getGameTimeDeltaPartialTick(true);
+         RenderContext context = new RenderContext(guiGraphics);
         //? } else if >= 1.20.0 {
 
         // @Inject(at = @At("HEAD"), method = "render")
-        // public void render(net.minecraft.client.gui.GuiGraphicsExtractor guiGraphics, float delta, CallbackInfo info) {
+        // public void render(net.minecraft.client.gui.GuiGraphics guiGraphics, float delta, CallbackInfo info) {
         // RenderContext context = new RenderContext(guiGraphics);
         //? } else {
 
@@ -77,8 +77,8 @@ public class GuiMixin {
         //spotless:off
         //? if >= 1.21.0 && < 1.21.6 {
 
-        //    }
-        // });
+            }
+         });
         //? }
     }
 

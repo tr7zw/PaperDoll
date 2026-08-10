@@ -1,6 +1,6 @@
 package dev.tr7zw.paperdoll;
 
-import java.util.Set;
+import java.util.*;
 import java.util.stream.*;
 
 import com.mojang.blaze3d.systems.RenderSystem;
@@ -10,12 +10,13 @@ import dev.tr7zw.paperdoll.PaperDollSettings.DollHeadMode;
 import dev.tr7zw.transition.mc.EntityUtil;
 import dev.tr7zw.transition.mc.LightingUtil;
 import dev.tr7zw.transition.mc.MathUtil;
+import dev.tr7zw.transition.mc.extending.*;
 import dev.tr7zw.trender.gui.client.*;
 import net.minecraft.client.CameraType;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.screens.inventory.*;
 //? if < 26.2
-//import net.minecraft.client.renderer.MultiBufferSource;
+import net.minecraft.client.renderer.MultiBufferSource;
 import net.minecraft.client.renderer.entity.EntityRenderDispatcher;
 import net.minecraft.util.Mth;
 import net.minecraft.world.entity.Entity;
@@ -44,13 +45,13 @@ public class PaperDollRenderer {
             return;
         //? if >= 26.2 {
 
-        if (mc_instance.gui.hud.isHidden())
+        /*if (mc_instance.gui.hud.isHidden())
             return;
-        //? } else {
-        /*
+        *///? } else {
+        
         if (mc_instance.options.hideGui)
             return;
-        *///? }
+        //? }
 
         int xpos = 0;
         int ypos = 0;
@@ -74,9 +75,9 @@ public class PaperDollRenderer {
         }
         // FIXME: Workaround for 26.1 new renderlogic having different positioning
         //? if >= 26.1 {
-        xpos -= 50;
+        /*xpos -= 50;
         ypos -= 50;
-        //? }
+        *///? }
         int size = 25 + instance.settings.dollSize;
         int fSize = size;
         int fXpos = xpos;
@@ -107,37 +108,32 @@ public class PaperDollRenderer {
         boolean lockYHeadRot = instance.settings.dollHeadMode == DollHeadMode.LOCKED;
         boolean lockXHeadRot = lockYHeadRot || instance.settings.dollHeadMode == DollHeadMode.FREE_HORIZONTAL
                 || instance.settings.dollHeadMode == DollHeadMode.STATIC_HORIZONTAL;
+        var vehicleRenderStates = new ArrayList<>();
         if (!instance.settings.hideVehicle && playerEntity.isPassenger()) {
             Entity vehicle = playerEntity.getRootVehicle();
             var stream = getPassengersAndSelf(vehicle);
             //? if >= 26.1 {
-            if (!(vehicle instanceof LivingEntity)) {
-                stream = reverse(stream);
-            }
+
+            /*boolean getRenderState = true;
+            *///? } else {
+            
+            boolean getRenderState = false;
             //? }
             stream.forEachOrdered(entity -> {
-                double yOffset = fYpos;
-                if (entity != playerEntity)
-                    yOffset += (playerEntity.getY() - entity.getY()) * fSize;
-                if (entity instanceof LivingEntity living) {
-                    drawEntity(context, fXpos, yOffset, fSize, lookSides, lookUpDown, living, delta, lockXHeadRot,
-                            lockYHeadRot);
-                } else {
-                    // yOffset -= 10;
-                    drawEntity(context, fXpos, yOffset, fSize, lookSides, lookUpDown, entity, delta, lockYHeadRot,
-                            lockYHeadRot);
+                if (entity == playerEntity) {
+                    return;
                 }
+                double yOffset = 0;
+                if (entity != playerEntity)
+                    yOffset = (playerEntity.getY() - entity.getY());
+
+                vehicleRenderStates.add(drawEntity(context, fXpos, fYpos + (yOffset * fSize), fSize, lookSides,
+                        lookUpDown, entity, delta, lockXHeadRot, lockYHeadRot, getRenderState, null, -yOffset));
             });
-        } else {
-            drawEntity(context, fXpos, fYpos, size, lookSides, lookUpDown, playerEntity, delta, lockYHeadRot,
-                    lockYHeadRot);
         }
+        drawEntity(context, fXpos, fYpos, size, lookSides, lookUpDown, playerEntity, delta, lockYHeadRot, lockYHeadRot,
+                false, vehicleRenderStates.isEmpty() ? null : vehicleRenderStates, 0);
 
-    }
-
-    static <T> Stream<T> reverse(Stream<T> input) {
-        Object[] temp = input.toArray();
-        return (Stream<T>) IntStream.range(0, temp.length).mapToObj(i -> temp[temp.length - i - 1]);
     }
 
     private boolean shouldAutoHide(LivingEntity livingEntity) {
@@ -180,8 +176,9 @@ public class PaperDollRenderer {
     }
 
     // Modified version from InventoryScreen
-    private void drawEntity(RenderContext context, double xpos, double ypos, int size, float lookSides,
-            float lookUpDown, Entity entity, float delta, boolean lockHeadXRot, boolean lockHeadYRot) {
+    private Object drawEntity(RenderContext context, double xpos, double ypos, int size, float lookSides,
+            float lookUpDown, Entity entity, float delta, boolean lockHeadXRot, boolean lockHeadYRot,
+            boolean getRenderState, List<Object> vehicleRenderStates, double stateOffsetY) {
         Minecraft mc_instance = Minecraft.getInstance();
         float rotationSide = (float) Math.atan((double) (lookSides / 40.0F));
         float rotationUp = (float) Math.atan((double) (lookUpDown / 40.0F));
@@ -197,10 +194,10 @@ public class PaperDollRenderer {
         matrixStack.scale((float) size, (float) size, (float) size);
         //? if >= 1.21.6 {
 
-        int rot = 180;
-        //? } else if >= 1.20.5 {
+        /*int rot = 180;
+        *///? } else if >= 1.20.5 {
 
-        // int rot = 0;
+         int rot = 0;
         //? } else {
 
         // int rot = 180;
@@ -217,7 +214,7 @@ public class PaperDollRenderer {
             rotation *= -1;
             offsetX += Math.cos(rotation) * offsetXTmp - Math.sin(rotation) * offsetZTmp;
             offsetZ += Math.sin(rotation) * offsetXTmp + Math.cos(rotation) * offsetZTmp;
-            // y offset is handeled above since the vehicle is moved down
+            // y offset is handeled above since the vehicle is moved down, 26.1 needs it here
         }
         var quaternion = MathUtil.ZP.rotationDegrees(180.0F);
         var quaternion2 = MathUtil.XP.rotationDegrees(rotationUp * 20.0F);
@@ -286,24 +283,31 @@ public class PaperDollRenderer {
         EntityRenderDispatcher entityRenderDispatcher = mc_instance.getEntityRenderDispatcher();
         MathUtil.conjugate(quaternion2);
         //? if < 1.21.10 {
-        /*
+        
         entityRenderDispatcher.overrideCameraOrientation(quaternion2);
         entityRenderDispatcher.setRenderShadow(false);
-        *///? }
+        //? }
            //? if < 26.2 {
-           /*
+           
            MultiBufferSource.BufferSource bufferSource = Minecraft.getInstance().renderBuffers().bufferSource();
-           *///? }
+           //? }
            // Mc renders the player in the inventory without delta, causing it to look
            // "laggy". Good luck unseeing this :)
            //? if >= 26.1 {
 
-        var vector3f = new org.joml.Vector3f((float) offsetX, 0, (float) offsetZ);
+        /*var vector3f = new org.joml.Vector3f((float) offsetX, 0, (float) offsetZ);
         var state = entityRenderDispatcher.getRenderer(entity).createRenderState(entity, delta);
         state.shadowPieces.clear();
-        context.getGuiGraphics().entity(state, (float) size, vector3f, quaternion, quaternion2, (int) (xpos),
-                (int) (ypos), (int) (xpos + (size * 4)), (int) (ypos + (size * 4))); // TODO: Magic numbers
-        //? } else if >= 1.21.6 {
+        if (vehicleRenderStates != null && state instanceof ExtensionHolder extensionHolder) {
+            extensionHolder.setExtension("PaperDollVehicles", vehicleRenderStates);
+        }
+        if (!getRenderState) {
+            context.getGuiGraphics().entity(state, (float) size, vector3f, quaternion, quaternion2, (int) (xpos),
+                    (int) (ypos), (int) (xpos + (size * 4)), (int) (ypos + (size * 4))); // TODO: Magic numbers
+        } else {
+            state.y = stateOffsetY;
+        }
+        *///? } else if >= 1.21.6 {
 
         /*float o = 1;
         var vector3f = new org.joml.Vector3f((float) offsetX, 0, (float) offsetZ);
@@ -319,17 +323,17 @@ public class PaperDollRenderer {
         //        15728880);
         //? } else {
 
-        // entityRenderDispatcher.render(entity, offsetX, offsetY, offsetZ, 0.0F, delta, matrixStack, bufferSource,
-        //        15728880);
+         entityRenderDispatcher.render(entity, offsetX, offsetY, offsetZ, 0.0F, delta, matrixStack, bufferSource,
+                15728880);
         //? }
         //? if < 26.2 {
-        /*
+        
         bufferSource.endBatch();
-        *///? }
+        //? }
            //? if < 1.21.10 {
-           /*
+           
            entityRenderDispatcher.setRenderShadow(true);
-           *///? }
+           //? }
         if (entity instanceof PlayerAccess player) {
             player.setLastDeletaMovement(lastDeltaMovement);
         }
@@ -352,7 +356,13 @@ public class PaperDollRenderer {
         // #else
         // $$ com.mojang.blaze3d.platform.Lighting.setupFor3DItems();
         // #endif
+        //? if >= 26.1 {
 
+        /*return state;
+        *///? } else {
+        
+        return null;
+        //? }
     }
 
     private void prepareViewMatrix(double xpos, double ypos) {
@@ -363,7 +373,7 @@ public class PaperDollRenderer {
         RenderSystem.getModelViewStack().scale(-1.0F, 1.0F, 1.0F);
         //? if < 1.21.2 {
 
-        // RenderSystem.applyModelViewMatrix();
+         RenderSystem.applyModelViewMatrix();
         //? }
         //? } else if >= 1.17.0 {
 
@@ -386,7 +396,7 @@ public class PaperDollRenderer {
         RenderSystem.getModelViewStack().popMatrix();
         //? if < 1.21.2 {
 
-        // RenderSystem.applyModelViewMatrix();
+         RenderSystem.applyModelViewMatrix();
         //? }
         //? } else if >= 1.17.0 {
 
@@ -401,10 +411,10 @@ public class PaperDollRenderer {
     private void prepareLighting() {
         //? if >= 1.21.6 {
 
-        LightingUtil.prepareLightingEntity();
-        //? } else if >= 1.17.0 {
+        /*LightingUtil.prepareLightingEntity();
+        *///? } else if >= 1.17.0 {
 
-        // com.mojang.blaze3d.platform.Lighting.setupForEntityInInventory();
+         com.mojang.blaze3d.platform.Lighting.setupForEntityInInventory();
         //? } else {
 
         // com.mojang.blaze3d.platform.Lighting.setupForFlatItems();

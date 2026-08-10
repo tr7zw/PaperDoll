@@ -52,8 +52,8 @@ public class PaperDollShared {
         if (settings == null) {
             settings = new PaperDollSettings();
             //? if >= 26.1 {
-            settings.hideVehicle = true; // TODO: Workaround cause broken
-            //? }
+            /*settings.hideVehicle = true; // TODO: Workaround cause broken
+            *///? }
             writeSettings();
         }
         //? if forge || neoforge {
