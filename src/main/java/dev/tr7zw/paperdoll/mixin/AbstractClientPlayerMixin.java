@@ -14,25 +14,25 @@ public class AbstractClientPlayerMixin implements PlayerAccess {
 
     /*@Override
     public Vec3 getLastDelataMovement() {
-
+    
         return null;
     }
-
+    
     @Override
     public void setLastDeletaMovement(Vec3 vec3) {
-
+    
     }
     *///? } else if >= 1.19.4 {
-    
+
     @Shadow
     private Vec3 deltaMovementOnPreviousTick;
-    
+
     @Override
     public Vec3 getLastDelataMovement() {
-    
+
         return deltaMovementOnPreviousTick;
     }
-    
+
     @Override
     public void setLastDeletaMovement(Vec3 vec3) {
         deltaMovementOnPreviousTick = vec3;

@@ -48,7 +48,7 @@ public class PaperDollRenderer {
         /*if (mc_instance.gui.hud.isHidden())
             return;
         *///? } else {
-        
+
         if (mc_instance.options.hideGui)
             return;
         //? }
@@ -116,7 +116,7 @@ public class PaperDollRenderer {
 
             /*boolean getRenderState = true;
             *///? } else {
-            
+
             boolean getRenderState = false;
             //? }
             stream.forEachOrdered(entity -> {
@@ -197,7 +197,7 @@ public class PaperDollRenderer {
         /*int rot = 180;
         *///? } else if >= 1.20.5 {
 
-         int rot = 0;
+        int rot = 0;
         //? } else {
 
         // int rot = 180;
@@ -283,17 +283,17 @@ public class PaperDollRenderer {
         EntityRenderDispatcher entityRenderDispatcher = mc_instance.getEntityRenderDispatcher();
         MathUtil.conjugate(quaternion2);
         //? if < 1.21.10 {
-        
+
         entityRenderDispatcher.overrideCameraOrientation(quaternion2);
         entityRenderDispatcher.setRenderShadow(false);
         //? }
-           //? if < 26.2 {
-           
-           MultiBufferSource.BufferSource bufferSource = Minecraft.getInstance().renderBuffers().bufferSource();
-           //? }
-           // Mc renders the player in the inventory without delta, causing it to look
-           // "laggy". Good luck unseeing this :)
-           //? if >= 26.1 {
+        //? if < 26.2 {
+
+        MultiBufferSource.BufferSource bufferSource = Minecraft.getInstance().renderBuffers().bufferSource();
+        //? }
+        // Mc renders the player in the inventory without delta, causing it to look
+        // "laggy". Good luck unseeing this :)
+        //? if >= 26.1 {
 
         /*var vector3f = new org.joml.Vector3f((float) offsetX, 0, (float) offsetZ);
         var state = entityRenderDispatcher.getRenderer(entity).createRenderState(entity, delta);
@@ -323,17 +323,17 @@ public class PaperDollRenderer {
         //        15728880);
         //? } else {
 
-         entityRenderDispatcher.render(entity, offsetX, offsetY, offsetZ, 0.0F, delta, matrixStack, bufferSource,
+        entityRenderDispatcher.render(entity, offsetX, offsetY, offsetZ, 0.0F, delta, matrixStack, bufferSource,
                 15728880);
         //? }
         //? if < 26.2 {
-        
+
         bufferSource.endBatch();
         //? }
-           //? if < 1.21.10 {
-           
-           entityRenderDispatcher.setRenderShadow(true);
-           //? }
+        //? if < 1.21.10 {
+
+        entityRenderDispatcher.setRenderShadow(true);
+        //? }
         if (entity instanceof PlayerAccess player) {
             player.setLastDeletaMovement(lastDeltaMovement);
         }
@@ -360,7 +360,7 @@ public class PaperDollRenderer {
 
         /*return state;
         *///? } else {
-        
+
         return null;
         //? }
     }
@@ -373,7 +373,7 @@ public class PaperDollRenderer {
         RenderSystem.getModelViewStack().scale(-1.0F, 1.0F, 1.0F);
         //? if < 1.21.2 {
 
-         RenderSystem.applyModelViewMatrix();
+        RenderSystem.applyModelViewMatrix();
         //? }
         //? } else if >= 1.17.0 {
 
@@ -396,7 +396,7 @@ public class PaperDollRenderer {
         RenderSystem.getModelViewStack().popMatrix();
         //? if < 1.21.2 {
 
-         RenderSystem.applyModelViewMatrix();
+        RenderSystem.applyModelViewMatrix();
         //? }
         //? } else if >= 1.17.0 {
 
@@ -414,7 +414,7 @@ public class PaperDollRenderer {
         /*LightingUtil.prepareLightingEntity();
         *///? } else if >= 1.17.0 {
 
-         com.mojang.blaze3d.platform.Lighting.setupForEntityInInventory();
+        com.mojang.blaze3d.platform.Lighting.setupForEntityInInventory();
         //? } else {
 
         // com.mojang.blaze3d.platform.Lighting.setupForFlatItems();
