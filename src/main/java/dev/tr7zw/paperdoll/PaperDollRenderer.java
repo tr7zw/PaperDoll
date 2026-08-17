@@ -19,8 +19,7 @@ import net.minecraft.client.gui.screens.inventory.*;
 //import net.minecraft.client.renderer.MultiBufferSource;
 import net.minecraft.client.renderer.entity.EntityRenderDispatcher;
 import net.minecraft.util.Mth;
-import net.minecraft.world.entity.Entity;
-import net.minecraft.world.entity.LivingEntity;
+import net.minecraft.world.entity.*;
 import net.minecraft.world.phys.Vec3;
 
 public class PaperDollRenderer {
@@ -302,6 +301,15 @@ public class PaperDollRenderer {
         state.outlineColor = 0;
         if (vehicleRenderStates != null && state instanceof ExtensionHolder extensionHolder) {
             extensionHolder.setExtension("PaperDollVehicles", vehicleRenderStates);
+        }
+        if (state instanceof net.minecraft.client.renderer.entity.state.AvatarRenderState livingRenderState) {
+            if (livingRenderState.pose == Pose.FALL_FLYING) {
+                livingRenderState.flyingYRot = 0;
+            }
+
+            livingRenderState.boundingBoxWidth /= livingRenderState.scale;
+            livingRenderState.boundingBoxHeight /= livingRenderState.scale;
+            livingRenderState.scale = 1.0F;
         }
         if (!getRenderState) {
             context.getGuiGraphics().entity(state, (float) size, vector3f, quaternion, quaternion2, (int) (xpos),
