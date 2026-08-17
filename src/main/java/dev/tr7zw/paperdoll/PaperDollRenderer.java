@@ -105,6 +105,7 @@ public class PaperDollRenderer {
         Minecraft.getInstance().renderBuffers().bufferSource().endBatch();
         *///? }
 
+        instance.isExtractingPaperDoll = true;
         boolean lockYHeadRot = instance.settings.dollHeadMode == DollHeadMode.LOCKED;
         boolean lockXHeadRot = lockYHeadRot || instance.settings.dollHeadMode == DollHeadMode.FREE_HORIZONTAL
                 || instance.settings.dollHeadMode == DollHeadMode.STATIC_HORIZONTAL;
@@ -133,7 +134,7 @@ public class PaperDollRenderer {
         }
         drawEntity(context, fXpos, fYpos, size, lookSides, lookUpDown, playerEntity, delta, lockYHeadRot, lockYHeadRot,
                 false, vehicleRenderStates.isEmpty() ? null : vehicleRenderStates, 0);
-
+        instance.isExtractingPaperDoll = false;
     }
 
     private boolean shouldAutoHide(LivingEntity livingEntity) {
@@ -298,6 +299,7 @@ public class PaperDollRenderer {
         var vector3f = new org.joml.Vector3f((float) offsetX, 0, (float) offsetZ);
         var state = entityRenderDispatcher.getRenderer(entity).createRenderState(entity, delta);
         state.shadowPieces.clear();
+        state.outlineColor = 0;
         if (vehicleRenderStates != null && state instanceof ExtensionHolder extensionHolder) {
             extensionHolder.setExtension("PaperDollVehicles", vehicleRenderStates);
         }

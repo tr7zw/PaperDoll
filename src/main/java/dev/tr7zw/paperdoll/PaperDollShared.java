@@ -32,6 +32,7 @@ public class PaperDollShared {
     private boolean toggleKeybindPressed = false;
     public PaperDollSettings settings = new PaperDollSettings();
     public PaperDollRenderer renderer;
+    public boolean isExtractingPaperDoll = false;
 
     public void init() {
         instance = this;
