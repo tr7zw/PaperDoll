@@ -82,6 +82,8 @@ public class ConfigScreenProvider {
             autoHideOptions.add(getOnOffOption("text.paperdoll.hideDuringMusicToast",
                     () -> inst.settings.hideDuringMusicToast, (b) -> inst.settings.hideDuringMusicToast = b));
             //? }
+            autoHideOptions.add(getOnOffOption("text.paperdoll.hideDuringScreens", () -> inst.settings.hideDuringScreens,
+                    (b) -> inst.settings.hideDuringScreens = b));
             autoHideOptions.add(getOnOffOption("text.paperdoll.hideVehicle", () -> inst.settings.hideVehicle,
                     (b) -> inst.settings.hideVehicle = b));
 

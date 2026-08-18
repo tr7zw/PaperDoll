@@ -20,6 +20,7 @@ public class PaperDollSettings {
     public boolean hideInF5 = true;
     public boolean hideDuringF3 = true;
     public boolean hideDuringMusicToast = true;
+    public boolean hideDuringScreens = false;
     public boolean hideVehicle = false;
 
     public enum DollHeadMode {

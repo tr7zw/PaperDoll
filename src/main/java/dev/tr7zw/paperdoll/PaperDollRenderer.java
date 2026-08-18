@@ -8,9 +8,7 @@ import com.mojang.blaze3d.vertex.PoseStack;
 
 import dev.tr7zw.paperdoll.PaperDollSettings.DollHeadMode;
 import dev.tr7zw.paperdoll.mixin.*;
-import dev.tr7zw.transition.mc.EntityUtil;
-import dev.tr7zw.transition.mc.LightingUtil;
-import dev.tr7zw.transition.mc.MathUtil;
+import dev.tr7zw.transition.mc.*;
 import dev.tr7zw.transition.mc.extending.*;
 import dev.tr7zw.trender.gui.client.*;
 import net.minecraft.client.CameraType;
@@ -52,6 +50,9 @@ public class PaperDollRenderer {
         /*if (mc_instance.options.hideGui)
             return;
         *///? }
+
+        if (GeneralUtil.getScreen() != null && instance.settings.hideDuringScreens)
+            return;
 
         //? if >= 26.2 {
         if (instance.settings.hideDuringMusicToast

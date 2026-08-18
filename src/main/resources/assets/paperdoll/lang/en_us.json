@@ -44,6 +44,8 @@
     "text.paperdoll.hideDuringF3.tooltip": "Hides the doll while any F3 debug text is visible",
     "text.paperdoll.hideDuringMusicToast": "Hide During Music Toast",
     "text.paperdoll.hideDuringMusicToast.tooltip": "Hides the doll while the music toast is visible",
+    "text.paperdoll.hideDuringScreens": "Hide During Screens",
+    "text.paperdoll.hideDuringScreens.tooltip": "Hides the doll while any screen is open (e.g., inventory, chat, etc.)",
     "text.paperdoll.hideVehicle": "Hide vehicles",
     "text.paperdoll.hideVehicle.tooltip": "Prevent rendering vehicles",
     "text.paperdoll.category.auto_hide_exceptions": "Show PaperDoll when",
