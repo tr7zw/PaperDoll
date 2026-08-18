@@ -8,6 +8,9 @@ import com.mojang.blaze3d.vertex.PoseStack;
 
 import dev.tr7zw.paperdoll.PaperDollSettings.DollHeadMode;
 import dev.tr7zw.paperdoll.mixin.*;
+import dev.tr7zw.paperdoll.tempholders.*;
+import dev.tr7zw.transition.logic.*;
+import dev.tr7zw.transition.logic.tempholders.*;
 import dev.tr7zw.transition.mc.*;
 import dev.tr7zw.transition.mc.extending.*;
 import dev.tr7zw.trender.gui.client.*;
@@ -23,6 +26,8 @@ import net.minecraft.world.phys.Vec3;
 
 public class PaperDollRenderer {
 
+    private final static TemporaryStateScope<Entity> tempStateScope = new TemporaryStateScope<>(
+            Set.of(new RotationHolder(), new LivingVehicleHolder(), new DeltaMovementHolder()));
     private final PaperDollShared instance = PaperDollShared.instance;
     private long showTill = 0;
 
@@ -95,12 +100,17 @@ public class PaperDollRenderer {
                 if (entity != playerEntity)
                     yOffset = (playerEntity.getY() - entity.getY());
 
-                vehicleRenderStates.add(drawEntity(context, fXpos, fYpos + (yOffset * fSize), fSize, lookSides,
-                        lookUpDown, entity, delta, lockXHeadRot, lockYHeadRot, getRenderState, null, -yOffset));
+                int finalYOffset = (int) yOffset;
+                tempStateScope.apply(entity, ent -> {
+                    vehicleRenderStates.add(drawEntity(context, fXpos, fYpos + (finalYOffset * fSize), fSize, lookSides,
+                            lookUpDown, ent, delta, lockXHeadRot, lockYHeadRot, getRenderState, null, -finalYOffset));
+                });
             });
         }
-        drawEntity(context, fXpos, fYpos, size, lookSides, lookUpDown, playerEntity, delta, lockYHeadRot, lockYHeadRot,
-                false, vehicleRenderStates.isEmpty() ? null : vehicleRenderStates, 0);
+        tempStateScope.apply(playerEntity, ent -> {
+            drawEntity(context, fXpos, fYpos, size, lookSides, lookUpDown, ent, delta, lockYHeadRot, lockYHeadRot,
+                    false, vehicleRenderStates.isEmpty() ? null : vehicleRenderStates, 0);
+        });
         instance.isExtractingPaperDoll = false;
     }
 
@@ -252,37 +262,28 @@ public class PaperDollRenderer {
         var quaternion2 = MathUtil.XP.rotationDegrees(rotationUp * 20.0F);
         quaternion.mul(quaternion2);
         matrixStack.mulPose(quaternion);
-        float yRot = EntityUtil.getYRot(entity);
-        float yRotO = entity.yRotO;
-        float xRot = EntityUtil.getXRot(entity);
-        float xRotO = entity.xRotO;
-        float yHeadRotO = 0;
-        float yHeadRot = 0;
-        float yBodyRotO = 0;
-        float yBodyRot = 0;
+        float original_yRot = EntityUtil.getYRot(entity);
+        float original_yRotO = entity.yRotO;
+        float original_yHeadRotO = 0;
+        float original_yHeadRot = 0;
+        float original_yBodyRotO = 0;
+        float original_yBodyRot = 0;
         if (entity instanceof LivingEntity livingEntity) {
-            yHeadRotO = livingEntity.yHeadRotO;
-            yHeadRot = livingEntity.yHeadRot;
-            yBodyRotO = livingEntity.yBodyRotO;
-            yBodyRot = livingEntity.yBodyRot;
+            original_yHeadRotO = livingEntity.yHeadRotO;
+            original_yHeadRot = livingEntity.yHeadRot;
+            original_yBodyRotO = livingEntity.yBodyRotO;
+            original_yBodyRot = livingEntity.yBodyRot;
         }
-        Vec3 deltaMovement = entity.getDeltaMovement();
-        float vehicleYBodyRot = 0;
-        float vehicleYBodyRotO = 0;
         EntityUtil.setYRot(entity, rot + rotationSide * 40.0F);
         entity.yRotO = EntityUtil.getYRot(entity);
         if (entity instanceof LivingEntity livingEntity) {
             livingEntity.yBodyRot = rot + rotationSide * 20.0F;
             livingEntity.yBodyRotO = livingEntity.yBodyRot;
         }
-        Vec3 lastDeltaMovement = null;
         if (entity instanceof PlayerAccess player) {
-            lastDeltaMovement = player.getLastDelataMovement();
             player.setLastDeletaMovement(Vec3.ZERO);
         }
         if (entity.isPassenger() && entity.getVehicle() instanceof LivingEntity livingVehicle) {
-            vehicleYBodyRot = livingVehicle.yBodyRot;
-            vehicleYBodyRotO = livingVehicle.yBodyRotO;
             if (entity instanceof LivingEntity livingEntity) {
                 livingVehicle.yBodyRot = livingEntity.yBodyRot;
                 livingVehicle.yBodyRotO = livingEntity.yBodyRotO;
@@ -304,11 +305,11 @@ public class PaperDollRenderer {
         } else if (entity instanceof LivingEntity livingEntity) {
             if (instance.settings.dollHeadMode == DollHeadMode.FREE
                     || instance.settings.dollHeadMode == DollHeadMode.FREE_HORIZONTAL) {
-                livingEntity.yHeadRot = rot + rotationSide * 40.0F - (yBodyRot - yHeadRot);
-                livingEntity.yHeadRotO = rot + rotationSide * 40.0F - (yBodyRotO - yHeadRotO);
+                livingEntity.yHeadRot = rot + rotationSide * 40.0F - (original_yBodyRot - original_yHeadRot);
+                livingEntity.yHeadRotO = rot + rotationSide * 40.0F - (original_yBodyRotO - original_yHeadRotO);
             } else {
-                livingEntity.yHeadRot = rot + rotationSide * 40.0F - (yRot - yHeadRot);
-                livingEntity.yHeadRotO = rot + rotationSide * 40.0F - (yRotO - yHeadRotO);
+                livingEntity.yHeadRot = rot + rotationSide * 40.0F - (original_yRot - original_yHeadRot);
+                livingEntity.yHeadRotO = rot + rotationSide * 40.0F - (original_yRotO - original_yHeadRotO);
             }
         }
         prepareLighting();
@@ -376,24 +377,6 @@ public class PaperDollRenderer {
 
         /*entityRenderDispatcher.setRenderShadow(true);
         *///? }
-        if (entity instanceof PlayerAccess player) {
-            player.setLastDeletaMovement(lastDeltaMovement);
-        }
-        if (entity instanceof LivingEntity livingEntity) {
-            livingEntity.yBodyRot = yBodyRot;
-            livingEntity.yBodyRotO = yBodyRotO;
-            livingEntity.yHeadRotO = yHeadRotO;
-            livingEntity.yHeadRot = yHeadRot;
-        }
-        EntityUtil.setYRot(entity, yRot);
-        entity.yRotO = yRotO;
-        EntityUtil.setXRot(entity, xRot);
-        entity.xRotO = xRotO;
-        entity.setDeltaMovement(deltaMovement);
-        if (entity.isPassenger() && entity.getVehicle() instanceof LivingEntity livingVehicle) {
-            livingVehicle.yBodyRot = vehicleYBodyRot;
-            livingVehicle.yBodyRotO = vehicleYBodyRotO;
-        }
         resetViewMatrix();
         // #else
         // $$ com.mojang.blaze3d.platform.Lighting.setupFor3DItems();
