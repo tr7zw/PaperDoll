@@ -33,11 +33,11 @@ public class PaperDollRenderer {
             return;
         //? if >= 1.20.2 {
 
-        if (mc_instance.getDebugOverlay().showDebugScreen())
+        if (mc_instance.getDebugOverlay().showDebugScreen() && instance.settings.hideDuringF3)
             return;
         //? } else {
 
-        // if (mc_instance.options.renderDebug)
+        // if (mc_instance.options.renderDebug && instance.settings.hideDuringF3)
         //     return;
         //? }
         if (mc_instance.level == null)

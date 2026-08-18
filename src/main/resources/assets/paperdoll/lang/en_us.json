@@ -40,6 +40,8 @@
     "text.paperdoll.autohide.tooltip": "Hides the doll when the player is not doing any action",
     "text.paperdoll.hideInF5": "Hide In F5",
     "text.paperdoll.hideInF5.tooltip": "Hides the doll while in F5 mode",
+    "text.paperdoll.hideDuringF3": "Hide During F3",
+    "text.paperdoll.hideDuringF3.tooltip": "Hides the doll while any F3 debug text is visible",
     "text.paperdoll.hideVehicle": "Hide vehicles",
     "text.paperdoll.hideVehicle.tooltip": "Prevent rendering vehicles",
     "text.paperdoll.category.auto_hide_exceptions": "Show PaperDoll when",

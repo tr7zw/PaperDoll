@@ -76,6 +76,8 @@ public class ConfigScreenProvider {
                     (b) -> inst.settings.autoHide = b));
             autoHideOptions.add(getOnOffOption("text.paperdoll.hideInF5", () -> inst.settings.hideInF5,
                     (b) -> inst.settings.hideInF5 = b));
+            autoHideOptions.add(getOnOffOption("text.paperdoll.hideDuringF3", () -> inst.settings.hideDuringF3,
+                    (b) -> inst.settings.hideDuringF3 = b));
             autoHideOptions.add(getOnOffOption("text.paperdoll.hideVehicle", () -> inst.settings.hideVehicle,
                     (b) -> inst.settings.hideVehicle = b));
 
