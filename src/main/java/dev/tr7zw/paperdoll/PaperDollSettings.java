@@ -19,6 +19,7 @@ public class PaperDollSettings {
     public final Set<AutoHideException> autoHideBlacklist = new HashSet<>();
     public boolean hideInF5 = true;
     public boolean hideDuringF3 = true;
+    public boolean hideDuringMusicToast = true;
     public boolean hideVehicle = false;
 
     public enum DollHeadMode {

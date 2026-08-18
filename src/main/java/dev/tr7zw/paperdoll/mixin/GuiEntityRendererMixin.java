@@ -53,8 +53,8 @@ public class GuiEntityRendererMixin {
                     poseStack.popPose();
                 }
                 //? if = 26.1 {
-                /*
-                featureRenderDispatcher.renderAllFeatures();
+
+                /*featureRenderDispatcher.renderAllFeatures();
                 *///? }
             }
         }

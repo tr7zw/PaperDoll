@@ -7,6 +7,7 @@ import com.mojang.blaze3d.systems.RenderSystem;
 import com.mojang.blaze3d.vertex.PoseStack;
 
 import dev.tr7zw.paperdoll.PaperDollSettings.DollHeadMode;
+import dev.tr7zw.paperdoll.mixin.*;
 import dev.tr7zw.transition.mc.EntityUtil;
 import dev.tr7zw.transition.mc.LightingUtil;
 import dev.tr7zw.transition.mc.MathUtil;
@@ -50,6 +51,23 @@ public class PaperDollRenderer {
 
         /*if (mc_instance.options.hideGui)
             return;
+        *///? }
+
+        //? if >= 26.2 {
+        if (instance.settings.hideDuringMusicToast
+                && !(((ToastManagerAccessor) mc_instance.gui.toastManager()).getNowPlayingToast() == null
+                        || ((ToastManagerAccessor) mc_instance.gui.toastManager()).getNowPlayingToast()
+                                .hasFinishedRendering())) {
+            return;
+        }
+        //? } else if >= 26.1 {
+
+        /*if (instance.settings.hideDuringMusicToast
+                && !(((ToastManagerAccessor) mc_instance.getToastManager()).getNowPlayingToast() == null
+                        || ((ToastManagerAccessor) mc_instance.getToastManager()).getNowPlayingToast()
+                                .hasFinishedRendering())) {
+            return;
+        }
         *///? }
 
         int xpos = 0;

@@ -9,7 +9,8 @@
         "GuiRendererMixin",
         "GameRendererMixin",
         "GuiEntityRendererMixin",
-        "EntityMixin"
+        "EntityMixin",
+        "ToastManagerAccessor"
     ],
     "injectors": {
         "defaultRequire": 1

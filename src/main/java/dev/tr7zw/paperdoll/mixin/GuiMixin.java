@@ -25,8 +25,8 @@ import net.minecraft.client.DeltaTracker;
 
 @Mixin(net.minecraft.client.gui.Hud.class)
 //? } else {
-/*
-@Mixin(Gui.class)
+
+/*@Mixin(Gui.class)
 *///? }
 public class GuiMixin {
 
@@ -38,8 +38,8 @@ public class GuiMixin {
         float delta = deltaTracker.getGameTimeDeltaPartialTick(true);
         RenderContext context = new RenderContext(guiGraphics);
         //? } else if >= 26.1 {
-        /*
-        @Inject(at = @At("HEAD"), method = "extractHotbarAndDecorations")
+
+        /*@Inject(at = @At("HEAD"), method = "extractHotbarAndDecorations")
         public void render(net.minecraft.client.gui.GuiGraphicsExtractor guiGraphics, DeltaTracker deltaTracker,
             CallbackInfo ci) {
         float delta = deltaTracker.getGameTimeDeltaPartialTick(true);
