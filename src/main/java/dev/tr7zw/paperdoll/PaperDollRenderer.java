@@ -28,48 +28,10 @@ public class PaperDollRenderer {
 
     public void render(float delta, RenderContext context) {
         Minecraft mc_instance = Minecraft.getInstance();
-        if (!instance.settings.dollEnabled)
-            return;
-        //? if >= 1.20.2 {
 
-        if (mc_instance.getDebugOverlay().showDebugScreen() && instance.settings.hideDuringF3)
-            return;
-        //? } else {
-
-        // if (mc_instance.options.renderDebug && instance.settings.hideDuringF3)
-        //     return;
-        //? }
-        if (mc_instance.level == null)
-            return;
-        //? if >= 26.2 {
-
-        if (mc_instance.gui.hud.isHidden())
-            return;
-        //? } else {
-
-        /*if (mc_instance.options.hideGui)
-            return;
-        *///? }
-
-        if (GeneralUtil.getScreen() != null && instance.settings.hideDuringScreens)
-            return;
-
-        //? if >= 26.2 {
-        if (instance.settings.hideDuringMusicToast
-                && !(((ToastManagerAccessor) mc_instance.gui.toastManager()).getNowPlayingToast() == null
-                        || ((ToastManagerAccessor) mc_instance.gui.toastManager()).getNowPlayingToast()
-                                .hasFinishedRendering())) {
+        if (!shouldRender()) {
             return;
         }
-        //? } else if >= 26.1 {
-
-        /*if (instance.settings.hideDuringMusicToast
-                && !(((ToastManagerAccessor) mc_instance.getToastManager()).getNowPlayingToast() == null
-                        || ((ToastManagerAccessor) mc_instance.getToastManager()).getNowPlayingToast()
-                                .hasFinishedRendering())) {
-            return;
-        }
-        *///? }
 
         int xpos = 0;
         int ypos = 0;
@@ -104,19 +66,6 @@ public class PaperDollRenderer {
         int lookUpDown = instance.settings.dollLookingUpDown;
         Entity playerEntity = mc_instance.getCameraEntity() != null ? mc_instance.getCameraEntity()
                 : mc_instance.player;
-
-        if (instance.settings.autoHide && playerEntity instanceof LivingEntity livingEntity) {
-            boolean hide = shouldAutoHide(livingEntity);
-            if (hide && System.currentTimeMillis() > showTill) {
-                return;
-            }
-            if (!hide)
-                showTill = System.currentTimeMillis() + 500;
-        }
-
-        if (instance.settings.hideInF5 && Minecraft.getInstance().options.getCameraType() != CameraType.FIRST_PERSON) {
-            return;
-        }
 
         //? if >= 1.21.2 && < 26.1 {
         /*
@@ -153,6 +102,70 @@ public class PaperDollRenderer {
         drawEntity(context, fXpos, fYpos, size, lookSides, lookUpDown, playerEntity, delta, lockYHeadRot, lockYHeadRot,
                 false, vehicleRenderStates.isEmpty() ? null : vehicleRenderStates, 0);
         instance.isExtractingPaperDoll = false;
+    }
+
+    private boolean shouldRender() {
+        Minecraft mc_instance = Minecraft.getInstance();
+        if (!instance.settings.dollEnabled)
+            return false;
+        //? if >= 1.20.2 {
+
+        if (mc_instance.getDebugOverlay().showDebugScreen() && instance.settings.hideDuringF3)
+            return false;
+        //? } else {
+
+        // if (mc_instance.options.renderDebug && instance.settings.hideDuringF3)
+        //     return false;
+        //? }
+        if (mc_instance.level == null)
+            return false;
+        //? if >= 26.2 {
+
+        if (mc_instance.gui.hud.isHidden())
+            return false;
+        //? } else {
+
+        /*if (mc_instance.options.hideGui)
+            return false;
+        *///? }
+
+        if (GeneralUtil.getScreen() != null && instance.settings.hideDuringScreens)
+            return false;
+
+        //? if >= 26.2 {
+        if (instance.settings.hideDuringMusicToast
+                && !(((ToastManagerAccessor) mc_instance.gui.toastManager()).getNowPlayingToast() == null
+                        || ((ToastManagerAccessor) mc_instance.gui.toastManager()).getNowPlayingToast()
+                                .hasFinishedRendering())) {
+            return false;
+        }
+        //? } else if >= 26.1 {
+
+        /*if (instance.settings.hideDuringMusicToast
+                && !(((ToastManagerAccessor) mc_instance.getToastManager()).getNowPlayingToast() == null
+                        || ((ToastManagerAccessor) mc_instance.getToastManager()).getNowPlayingToast()
+                                .hasFinishedRendering())) {
+            return false;
+        }
+        *///? }
+
+        if (instance.settings.hideInF5 && Minecraft.getInstance().options.getCameraType() != CameraType.FIRST_PERSON) {
+            return false;
+        }
+
+        Entity playerEntity = mc_instance.getCameraEntity() != null ? mc_instance.getCameraEntity()
+                : mc_instance.player;
+
+        if (instance.settings.autoHide && playerEntity instanceof LivingEntity livingEntity) {
+            boolean hide = shouldAutoHide(livingEntity);
+            if (hide && System.currentTimeMillis() > showTill) {
+                return false;
+            }
+            if (!hide)
+                showTill = System.currentTimeMillis() + 500;
+        }
+
+        return true;
     }
 
     private boolean shouldAutoHide(LivingEntity livingEntity) {
