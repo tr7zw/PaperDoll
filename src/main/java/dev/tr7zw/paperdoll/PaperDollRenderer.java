@@ -346,7 +346,7 @@ public class PaperDollRenderer {
         }
         if (!getRenderState) {
             context.getGuiGraphics().entity(state, (float) size, vector3f, quaternion, quaternion2, (int) (xpos),
-                    (int) (ypos), (int) (xpos + (size * 4)), (int) (ypos + (size * 4))); // TODO: Magic numbers
+                    (int) (ypos), (int) (xpos + (size * 5)), (int) (ypos + (size * 5))); // TODO: Magic numbers
         } else {
             state.y = stateOffsetY;
         }
