@@ -167,48 +167,13 @@ public class PaperDollRenderer {
                 : mc_instance.player;
 
         if (instance.settings.autoHide && playerEntity instanceof LivingEntity livingEntity) {
-            boolean hide = shouldAutoHide(livingEntity);
+            boolean hide = AutoHideLogic.shouldAutoHide(livingEntity);
             if (hide && System.currentTimeMillis() > showTill) {
                 return false;
             }
             if (!hide)
                 showTill = System.currentTimeMillis() + 500;
         }
-
-        return true;
-    }
-
-    private boolean shouldAutoHide(LivingEntity livingEntity) {
-        Set<PaperDollSettings.AutoHideException> blacklist = instance.settings.autoHideBlacklist;
-
-        // Movement
-        if (livingEntity.isCrouching() && !blacklist.contains(PaperDollSettings.AutoHideException.CROUCHING))
-            return false;
-        if (livingEntity.isSprinting() && !blacklist.contains(PaperDollSettings.AutoHideException.RUNNING))
-            return false;
-        if (livingEntity.isFallFlying() && !blacklist.contains(PaperDollSettings.AutoHideException.FALL_FLYING))
-            return false;
-        if (livingEntity.isVisuallySwimming() && !blacklist.contains(PaperDollSettings.AutoHideException.SWIMMING))
-            return false;
-        if (livingEntity.isPassenger() && !blacklist.contains(PaperDollSettings.AutoHideException.IN_VEHICLE))
-            return false;
-
-        // Combat
-        if (livingEntity.isBlocking() && !blacklist.contains(PaperDollSettings.AutoHideException.BLOCKING))
-            return false;
-        if (livingEntity.isUsingItem() && !blacklist.contains(PaperDollSettings.AutoHideException.USING_ITEM))
-            return false;
-        if (livingEntity.swinging && !blacklist.contains(PaperDollSettings.AutoHideException.SWINGING))
-            return false;
-        if (livingEntity.hurtTime > 0 && !blacklist.contains(PaperDollSettings.AutoHideException.TAKING_DAMAGE))
-            return false;
-        if (livingEntity.isOnFire() && !blacklist.contains(PaperDollSettings.AutoHideException.ON_FIRE))
-            return false;
-        //? if >= 1.17.0 {
-
-        if (livingEntity.isInPowderSnow && !blacklist.contains(PaperDollSettings.AutoHideException.IN_POWDER_SNOW))
-            return false;
-        //? }
 
         return true;
     }
@@ -261,7 +226,13 @@ public class PaperDollRenderer {
         var quaternion = MathUtil.ZP.rotationDegrees(180.0F);
         var quaternion2 = MathUtil.XP.rotationDegrees(rotationUp * 20.0F);
         quaternion.mul(quaternion2);
+        //? if >= 26.3 {
+        matrixStack.rotate(quaternion);
+        //? } else {
+        /*
         matrixStack.mulPose(quaternion);
+         */
+        //? }
         float original_yRot = EntityUtil.getYRot(entity);
         float original_yRotO = entity.yRotO;
         float original_yHeadRotO = 0;
