@@ -349,9 +349,11 @@ public class PaperDollRenderer {
         /*entityRenderDispatcher.setRenderShadow(true);
         *///? }
         resetViewMatrix();
-        // #else
-        // $$ com.mojang.blaze3d.platform.Lighting.setupFor3DItems();
-        // #endif
+        //? if <= 1.21.7 {
+        /*
+        com.mojang.blaze3d.platform.Lighting.setupFor3DItems();
+         */
+        //? }
         //? if >= 26.1 {
 
         return state;
